@@ -105,7 +105,8 @@ let shadow (shadowColor : float4) (shadowWidth : float) : Shader =
     fun (background : float4) (sd : float) ->
         let alpha = invLerp(shadowWidth, 0, sd)
         if (alpha >= 0.0 && alpha <= 1.0) then
-            let shadow = float4(shadowColor.rgb, shadowColor.a*alpha)
+            let falloff = alpha*alpha
+            let shadow = float4(shadowColor.rgb, shadowColor.a*falloff)
             blend shadow background
         else 
             background

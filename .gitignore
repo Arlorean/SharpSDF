@@ -1,0 +1,7 @@
+
+*.fs.js
+/bin
+/node_modules
+/obj
+/.vscode
+/.config

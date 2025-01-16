@@ -1,25 +1,17 @@
 ﻿open SharpSDF
-open SharpSDF.Colors
 
 let main() =
-    let sdfShader =
-        outerShadow gray50 30.0 |>>
-        solidFill blue |>> 
-        innerShadow gray50 30.0 |>> 
-        solidStroke red 20.0
-     
-    let sdfShape =
-        (_circle 100.0 |> _sdf)
-    
-    let background = clear
+#if FABLE_COMPILER
+    let webGL = new WebGLRenderer.WebGLRenderer("#WebGLRenderer")
+    let shaderSource = ShaderGenerator.makeShader TestShader.shader
+    webGL.RenderSource( shaderSource )
 
-    let shader position =
-        (position |> SdfContext.Create |> sdfShape |> sdfShader background) 
-
-    let renderer = new SharpSDF.WebGLRenderer.WebGLRenderer(".view")
-
-    let shaderSource = ShaderGenerator.makeShader shader
-
-    renderer.RenderSource( shaderSource )
+    let canvas = new CanvasRenderer.CanvasRenderer("#CanvasRenderer")
+    canvas.Render TestShader.shader
+#else
+    let console = new ConsoleRenderer.ConsoleRenderer(300, 300)
+    console.Render TestShader.shader
+    console.SavePNG "ConsoleRenderer.png"
+#endif
 
 main()

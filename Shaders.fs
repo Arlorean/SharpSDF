@@ -1,4 +1,4 @@
-module SharpSDF
+module SharpSDF.Shaders
 
 open SharpSDF.HLSL
 open SharpSDF.SDF

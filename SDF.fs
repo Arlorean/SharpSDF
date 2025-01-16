@@ -1,6 +1,6 @@
 module SharpSDF.SDF
 
-open SharpSDF.HLSL
+open HLSL
 open type Intrinsics
 
 let sdCircle (p:float2) r = length(p) - r

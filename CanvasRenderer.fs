@@ -1,4 +1,4 @@
-module SharpSDF.Renderer
+module SharpSDF.CanvasRenderer
 
 open Browser.Types
 open Browser
@@ -11,7 +11,7 @@ type CanvasRenderer =
     val private imageData: ImageData
 
     new (canvasId:string) = 
-        let canvas = document.querySelector(".view") :?> HTMLCanvasElement
+        let canvas = document.querySelector(canvasId) :?> HTMLCanvasElement
         let context = canvas.getContext_2d()
         let imageData = context.createImageData(int canvas.width,int canvas.height)
         { canvas=canvas; context=context; imageData=imageData }

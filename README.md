@@ -1,15 +1,5 @@
 # SharpSDF
 
-SharpSDF is an F# library for writing HLSL shaders that can be tested and renderered using the CPU using .NET and also transpiled into HLSL (or GLSL) shader code for execution on the GPU.
-
-The library also contains a set of Signed Distance Functions for rendering images without using geometry.
-
-The initial setup uses Fable/F# to render using a WebBrowser.
-
-Future versions will add support for Unity ShaderLab HLSL shader generation at compile time (not possible at runtime).
-
-## Example
-
 > ![alt text](docs/images/SharpSDF-Example.png)
 
 ```fsharp
@@ -28,6 +18,14 @@ let shader position =
 let renderer = CanvasRenderer(".view")
 renderer.Render shader
 ```
+
+SharpSDF is an F# library for writing HLSL shaders that can be tested and renderered using the CPU using .NET and also transpiled into HLSL (or GLSL) shader code for execution on the GPU.
+
+The library also contains a set of Signed Distance Functions for rendering images without using geometry.
+
+The initial setup uses Fable/F# to render using a WebBrowser.
+
+Future versions will add support for Unity ShaderLab HLSL shader generation at compile time (not possible at runtime).
 
 ## Setup
 

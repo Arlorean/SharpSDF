@@ -9,6 +9,7 @@
     <Compile Include="Shaders.fs" />
     <Compile Include="Colors.fs" />
     <Compile Include="CanvasRenderer.fs" />
+    <Compile Include="WebGLRenderer.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

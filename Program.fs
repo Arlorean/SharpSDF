@@ -2,6 +2,7 @@
 open SharpSDF.Colors
 open SharpSDF.Renderer
 
+
 let main() =
     let sdfShader =
         outerShadow gray50 30.0 |>>
@@ -17,7 +18,20 @@ let main() =
     let shader position =
         (position |> SdfContext.Create |> sdfShape |> sdfShader background) 
 
-    let renderer = CanvasRenderer(".view")
-    renderer.Render shader
+    // ShaderFn = float2 -> float4
+    // ShaderSource = string (HLSL source)
+
+    // Create:
+    // ShaderFn -> ShaderSource
+
+    // let renderer = CanvasRenderer(".view")
+    // renderer.Render shader
+
+    let renderer = new SharpSDF.WebGLRenderer.WebGLRenderer(".view")
+    renderer.RenderSource( """
+    void main() {
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color
+    }
+    """)
 
 main()

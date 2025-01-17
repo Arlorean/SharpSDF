@@ -1,8 +1,9 @@
 
 *.fs.js
-/bin
-/node_modules
-/obj
-/.vscode
+**/node_modules
+**/.vscode
 
 .fake
+**/.idea
+**/bin
+**/obj

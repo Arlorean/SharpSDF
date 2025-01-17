@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="HLSL.fs" />
+    <Compile Include="HLST.Ast.fs" />
+    <Compile Include="Quotation.fs" />
+    <Compile Include="Expression.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>

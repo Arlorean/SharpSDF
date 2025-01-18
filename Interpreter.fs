@@ -57,30 +57,3 @@ and evaluateBool (expr : Bool) : bool =
         (evaluateFloat1 a) >= (evaluateFloat1 b)
     | _ ->
         failwithf "Not implemented: %A" expr
-
-// // Compile (Float2 -> Float) into a (float2 -> float)
-// let compileToInterpreter (shape : Float2 -> Float) : (HLSL.float2 -> float) =
-//     fun (p : HLSL.float2) -> 
-//         p |> f2 |> shape |> evaluateFloat1
-
-// let compileToJS (shape : Float2 -> Float) : (HLSL.float2 -> float) =
-//     fun (p : HLSL.float2) -> 
-//         p |> f2 |> shape |> evaluateFloat1
-
-// let compileToIL (shape : Float2 -> Float) : (HLSL.float2 -> float) =
-//     fun (p : HLSL.float2) -> 
-//         p |> f2 |> shape |> evaluateFloat1
-
-// type HlslSource = HlslSource of string
-//     with
-//         member __.Source = let (HlslSource s) = __ in s
-//         override __.ToString() = __.Source
-//         static member Of s = HlslSource s
-
-// let compileToHLSL (shape : Float2 -> Float) : HlslSource =
-//     HlslSource.Of "float shape(float2 p) { return float(0); }"
-
-// // Referenced from test shader
-// let testShape : HLSL.float2 -> float = 
-//     (sdCircle (f1 100.0)) |> compileToInterpreter
-

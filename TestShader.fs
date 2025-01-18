@@ -19,5 +19,7 @@ let shape = shape2
 let background = clear
 
 let shader position =
-    //(position |> Position.Create |> (AstShapes.sdCircle (Ast.f1 100) |> astShape) |> sdfShader background) 
-    (position |> Position.Create |> (shape |> sdf) |> sdfShader background) 
+    position 
+    |> Position.Create 
+    |> (shape |> sdf) 
+    |> sdfShader background

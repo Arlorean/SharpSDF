@@ -8,44 +8,51 @@ open type SharpSDF.HLSL.Intrinsics
 type IShader =
     abstract render: distance:float -> float4
 
-type SdfContext = 
+/// Context allows us to implement shapes that transform the position (eg. translation)
+type Position = 
     {
-        Position: float2
+        Xy : float2
     }
     with
-        static member Create( p ) = { Position = p }
-        member __.X = __.Position.x
-        member __.Y = __.Position.y
-        member __.Offset( x, y ) = { __ with Position = float2( __.X + x, __.Y  + y ) }
-        member __.Offset( xy : float2 ) = { __ with Position = float2( __.X + xy.x, __.Y  + xy.y ) }
+        static member Create( p ) = { Xy = p }
+        member __.X = __.Xy.x
+        member __.Y = __.Xy.y
+        member __.Offset( x, y ) = { __ with Xy = float2( __.X + x, __.Y  + y ) }
+        member __.Offset( xy : float2 ) = { __ with Xy = float2( __.X + xy.x, __.Y  + xy.y ) }
 
-type SdfResult = float
-type ShaderResult = float4
+type SignedDistance = float
+type Color = float4
 
-type SdfFn = SdfContext -> SdfResult
-type ShaderFn = SdfResult -> ShaderResult
+type ShapeFn = Position -> SignedDistance
+type ShaderFn = SignedDistance -> Color
 
+/// A wrapper for a native shape function. Allows us to attach metadata to a native 
+/// shape function (eg name, source location, arguments, etc)
 type SdfShape = 
     {
-        Sdf : SdfFn
+        Sdf : ShapeFn
         Name : string
-        // ... other RTI
     }
     override __.ToString (): string = __.Name
 
-let _sdf (shape : SdfShape) (ctx : SdfContext) : float =
+/// Calculate signed distance field from a context and shape
+let sdf (shape : SdfShape) (ctx : Position) : float =
     ctx |> shape.Sdf 
 
+/// Shape whose function gets access to the Position object
 let mkShape name fn = { Sdf = fn; Name = name }
-let mkShapeWithMeta name fn = { Sdf = fn; Name = name }
+
+let mkShapeBasic name (fn : float2 -> float) 
+    = { Sdf = (fun p -> fn p.Xy) ; Name = name }
+
+//let mkShapeWithMeta name fn = { Sdf = fn; Name = name }
 
 let _circle (r : float) : SdfShape =
-    fun ctx -> sdCircle (ctx.Position) r
-    |> mkShape "Circle"
+    sdCircle r |> mkShapeBasic (sprintf "circle %f" r)
 
 let _translate (offset : float2) (s1 : SdfShape) : SdfShape =
-    fun (ctx : SdfContext) ->
-        ctx.Offset(offset) |> _sdf s1
+    fun (ctx : Position) ->
+        ctx.Offset(offset) |> sdf s1
     |> mkShape(sprintf "translate [%s] by (%f,%f)" s1.Name (offset.x) (offset.y))
 
 let _add (s1 : SdfShape) (s2 : SdfShape) : SdfShape =
@@ -54,14 +61,13 @@ let _add (s1 : SdfShape) (s2 : SdfShape) : SdfShape =
 let _sub (s1 : SdfShape) (s2 : SdfShape) : SdfShape =
     fun ctx ->
         opSubtraction 
-            (_sdf s1 ctx) 
-            (_sdf s2 ctx)
+            (sdf s1 ctx) 
+            (sdf s2 ctx)
     |> mkShape(sprintf "%s-%s" s1.Name s2.Name)
 
 let (+.) = _add
 
 let (-.) = _sub
-
 
 type Shader = float4 -> float -> float4
 

@@ -34,7 +34,7 @@ let sdRoundedBox (hs:Float2) (tr:Float,br:Float,tl:Float,bl:Float) (p:Float2) : 
 open SharpSDF.HLSL
 open type SharpSDF.HLSL.Intrinsics
 
-type SdfContext = 
+type Position = 
     {
         Position: Float2
     }
@@ -46,7 +46,7 @@ type SdfContext =
         // member __.Offset( xy : float2 ) = { __ with Position = float2( __.X + xy.x, __.Y  + xy.y ) }
 
 type SdfResult = Float
-type SdfFn = SdfContext -> SdfResult
+type SdfFn = Position -> SdfResult
 
 type SdfShape = 
     {
@@ -55,7 +55,7 @@ type SdfShape =
     }
     override __.ToString (): string = __.Name
 
-let _sdf (shape : SdfShape) (ctx : SdfContext) : Float =
+let _sdf (shape : SdfShape) (ctx : Position) : Float =
     ctx |> shape.Sdf 
 
 let mkShape name fn = { Sdf = fn; Name = name }
@@ -66,7 +66,7 @@ let _circle (r : Float) : SdfShape =
     |> mkShape "Circle"
 
 // let _translate (offset : float2) (s1 : SdfShape) : SdfShape =
-//     fun (ctx : SdfContext) ->
+//     fun (ctx : Position) ->
 //         ctx.Offset(offset) |> _sdf s1
 //     |> mkShape(sprintf "translate [%s] by (%f,%f)" s1.Name (offset.x) (offset.y))
 

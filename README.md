@@ -13,7 +13,7 @@ let sdfShape =
     (_circle 100.0 |> _sdf)
 
 let shader position =
-    (position |> SdfContext.Create |> sdfShape |> sdfShader clear) 
+    (position |> Position.Create |> sdfShape |> sdfShader clear) 
 
 let renderer = CanvasRenderer(".view")
 renderer.Render shader

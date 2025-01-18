@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "dotnet fable watch --run npx vite",
+    "start": "dotnet fable --verbose watch --run npx vite",
     "postinstall": "dotnet tool restore"
   },
   "devDependencies": {

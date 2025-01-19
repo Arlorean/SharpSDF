@@ -32,7 +32,7 @@ let roundedBox (hs:HLSL.float2) (tr:float,br:float,tl:float,bl:float) : ShapeFn 
         let tb = 
             if2_ (gt__ p.x 0)
                 (f2__  tr br)
-                (f2__  br tr)
+                (f2__  tl bl)
         
         let t = tb.x
         let b = tb.y

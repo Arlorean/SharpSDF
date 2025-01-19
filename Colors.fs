@@ -2,7 +2,7 @@ module SharpSDF.Colors
 
 open HLSL
 
-let clear    = float4(0,0,0,0) 
+let transparent    = float4(0,0,0,0) 
 
 let black    = float4(float3(0,0,0),1) 
 let blue     = float4(float3(0,0,1),1)

@@ -31,9 +31,12 @@ and [<RequireQualifiedAccess>] Float =
     | X of Float2
     | Y of Float2
     | If of (Bool * Float * Float)
+    static member op_Implicit(v:int) = Float(v)
+    static member op_Implicit(v:float) = Float(v)
     static member (-) (v1:Float, v2:Float) = Float.Sub(v1,v2)
     static member (-) (v1:Float, v2:float) = Float.Sub(v1, Float.Float v2)
     static member (+) (v1:Float, v2:Float) = Float.Add(v1,v2)
+    static member (/) (v1:Float, v2:Float) = Float.Div(v1,v2)
     static member inline op_GreaterThan (v1:Float, v2:Float) = Bool.Gt(v1, v2)
     static member inline op_GreaterThan (v1:Float, f : float) = Bool.Gt(v1, Float.Float f)
     static member Of (v : float) = Float.Float v
@@ -51,6 +54,7 @@ and [<RequireQualifiedAccess>] Float2 =
     | Min of Float2 * Float2
     | Max of Float2 * Float2
     | If of (Bool * Float2 * Float2)
+    static member op_Implicit(x:float,y:float) = Float2(x,y)
     static member (-) (v1:Float2, v2:Float2) = Float2.Sub2(v1,v2)
     static member (-) (v1:Float2, v2:HLSL.float2) = Float2.Sub2(v1, Float2.Of v2)
     static member (+) (v1:Float2, v2:Float2) = Float2.Add2(v1,v2)
@@ -91,34 +95,3 @@ type Intrinsics =
     static member length (v) = F1.Length(v)
     static member length (v) = F2.Length(v)
     
-type ShapeFn = Float2 -> Float
-
-// Summary:
-// 	•	Union: min(sdf1, sdf2)
-// 	•	Intersection: max(sdf1, sdf2)
-// 	•	Difference: max(sdf1, -sdf2)
-
-let union (a : ShapeFn) (b : ShapeFn) : ShapeFn = 
-    fun (p : Float2) ->
-        Float.Min( p |> a, p |> b ) 
-
-let intersection (a : ShapeFn) (b : ShapeFn) : ShapeFn = 
-    fun (p : Float2) ->
-        Float.Max( p |> a, p |> b ) 
-
-let difference (a : ShapeFn) (b : ShapeFn) : ShapeFn = 
-    fun (p : Float2) ->
-        Float.Max( p |> a, p |> b |> Float.Negate ) 
-
-let (<->) = difference    // Difference just can't be separated from the notion of "subtraction"
-let (<&>) = intersection  // Bits of the shape in A AND B
-// let (<|>) = union         // Bits of the shape in A OR B. Complements intersection / (&) nicely but arguably not as easy to think about as (+)
-let (<+>) = union         // Adding the shapes.
-
-let translate x y (shape : ShapeFn) : ShapeFn = 
-    fun (p : Float2) ->
-        Float2.Add2( p, f2__ x y ) |> shape
-
-let scale (s : float) (shape : ShapeFn) : ShapeFn = 
-    fun (p : Float2) ->
-        Float2.Mul( p, f1 (1.0 / s) ) |> shape

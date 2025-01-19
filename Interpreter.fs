@@ -13,6 +13,8 @@ let rec evaluateFloat1 (expr : Float) : float =
         f1 a - f1 b
     | Float.Add (a,b) ->
         f1 a + f1 b
+    | Float.Div (a,b) ->
+        f1 a / f1 b
     | Float.Min (a,b) ->
         HLSL.Intrinsics.min( f1 a, f1 b )
     | Float.Max (a,b) ->

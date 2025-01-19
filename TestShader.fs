@@ -17,7 +17,6 @@ let shape1 = AstShapes.circle 100.0
 
 let shape2 = AstShapes.roundedBox (HLSL.float2(100,100)) (20,20,20,20)
 
-
 let snowman : ShapeFn =
     AstShapes.circle 40
     <+>
@@ -28,17 +27,15 @@ let smallerSnowman =
     AstShapes.snowman |> Ast.scale 0.7
 
 let snowScene =
-    [1.0..3.0]
+    [1.0 .. 5.0]
     |> List.fold (fun shape i ->
         shape <+>
         (smallerSnowman 
             |> scale (1.0 / i)
-            |> translate (i * -80.0) 0
+            |> translate (i * -58.0) 0
         )
-
     ) AstShapes.empty
-    |> translate 150 0
-
+    |> translate 160 0
 
 let private shape = snowScene
 let private background = clear

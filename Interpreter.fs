@@ -1,59 +1,71 @@
 module SharpSDF.Interpreter
 
 open SharpSDF.Ast
-open type SharpSDF.Ast.Intrinsics
-
 
 let rec evaluateFloat1 (expr : Float) : float =
+    let f1 = evaluateFloat1
+    let f2 = evaluateFloat2
+    let b1  = evaluateBool
+
     match expr with
     | Float.Float (a) -> a
     | Float.Sub (a,b) ->
-        evaluateFloat1 a - evaluateFloat1 b
+        f1 a - f1 b
     | Float.Add (a,b) ->
-        evaluateFloat1 a + evaluateFloat1 b
+        f1 a + f1 b
     | Float.Min (a,b) ->
-        HLSL.Intrinsics.min( evaluateFloat1 a, evaluateFloat1 b )
+        HLSL.Intrinsics.min( f1 a, f1 b )
     | Float.Max (a,b) ->
-        HLSL.Intrinsics.max( evaluateFloat1 a, evaluateFloat1 b )
+        HLSL.Intrinsics.max( f1 a, f1 b )
     | Float.Length a ->
-        a |> evaluateFloat2 |> HLSL.Intrinsics.length
+        a |> f2 |> HLSL.Intrinsics.length
     | Float.Abs a ->
-        a |> evaluateFloat1 |> HLSL.Intrinsics.abs
+        a |> f1 |> HLSL.Intrinsics.abs
     | Float.X a ->
-        a |> evaluateFloat2 |> _.x
+        a |> f2 |> _.x
     | Float.Y a ->
-        a |> evaluateFloat2 |> _.y
+        a |> f2 |> _.y
     | Float.If (c, a, b) ->
-        if (evaluateBool c) then (evaluateFloat1 a) else (evaluateFloat1 b)
+        if (b1 c) then (f1 a) else (f1 b)
     | _ ->
         failwithf "Not implemented: %A" expr
 
 and evaluateFloat2 (expr : Float2) : HLSL.float2 =
+    let f1 = evaluateFloat1
+    let f2 = evaluateFloat2
+    let b1  = evaluateBool
+
     match expr with
     | Float2.Float2 (a,b) ->
-        HLSL.float2(a |> evaluateFloat1 ,b |> evaluateFloat1)
+        HLSL.float2(a |> f1 ,b |> f1)
+    | Float2.Mul (a,b) ->
+        (a |> f2) *  (b |> f1)
     | Float2.Add2 (a,b) ->
-        (a |> evaluateFloat2) +  (b |> evaluateFloat2)
+        (a |> f2) +  (b |> f2)
     | Float2.Sub2 (a,b) ->
-        (a |> evaluateFloat2) -  (b |> evaluateFloat2)
+        (a |> f2) -  (b |> f2)
     | Float2.Min (a,b) ->
-        HLSL.Intrinsics.min( evaluateFloat2 a, evaluateFloat2 b )
+        HLSL.Intrinsics.min( f2 a, f2 b )
     | Float2.Max (a,b) ->
-        HLSL.Intrinsics.max( evaluateFloat2 a, evaluateFloat2 b )
+        HLSL.Intrinsics.max( f2 a, f2 b )
     | Float2.If (c, a, b) ->
-        if (evaluateBool c) then (evaluateFloat2 a) else (evaluateFloat2 b)
+        if (b1 c) then (f2 a) else (f2 b)
     | _ ->
         failwithf "Not implemented: %A" expr
 
 and evaluateBool (expr : Bool) : bool =
+    let f1 = evaluateFloat1
+    let f2 = evaluateFloat2
+    let b1  = evaluateBool
+
     match expr with
     | Bool.Lt (a,b) ->
-        (evaluateFloat1 a) < (evaluateFloat1 b)
+        (f1 a) < (f1 b)
     | Bool.Le (a,b) ->
-        (evaluateFloat1 a) <= (evaluateFloat1 b)
+        (f1 a) <= (f1 b)
     | Bool.Gt (a,b) ->
-        (evaluateFloat1 a) > (evaluateFloat1 b)
+        (f1 a) > (f1 b)
     | Bool.Ge (a,b) ->
-        (evaluateFloat1 a) >= (evaluateFloat1 b)
+        (f1 a) >= (f1 b)
     | _ ->
         failwithf "Not implemented: %A" expr

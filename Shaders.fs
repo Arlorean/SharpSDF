@@ -1,74 +1,18 @@
 module SharpSDF.Shaders
 
 open SharpSDF.HLSL
-open SharpSDF.SDF
 
-open type SharpSDF.HLSL.Intrinsics
+open type HLSL.Intrinsics
 
 type IShader =
     abstract render: distance:float -> float4
 
-/// Context allows us to implement shapes that transform the position (eg. translation)
-type Position = 
-    {
-        Xy : float2
-    }
-    with
-        static member Create( p ) = { Xy = p }
-        member __.X = __.Xy.x
-        member __.Y = __.Xy.y
-        member __.Offset( x, y ) = { __ with Xy = float2( __.X + x, __.Y  + y ) }
-        member __.Offset( xy : float2 ) = { __ with Xy = float2( __.X + xy.x, __.Y  + xy.y ) }
-
 type SignedDistance = float
 type Color = float4
+type Position = float2
 
-type ShapeFn = Position -> SignedDistance
+type ShapeFn = Position -> SignedDistance   // Native shape function
 type ShaderFn = SignedDistance -> Color
-
-/// A wrapper for a native shape function. Allows us to attach metadata to a native 
-/// shape function (eg name, source location, arguments, etc)
-type SdfShape = 
-    {
-        Sdf : ShapeFn
-        Name : string
-    }
-    override __.ToString (): string = __.Name
-
-/// Calculate signed distance field from a context and shape
-let sdf (shape : SdfShape) (ctx : Position) : float =
-    ctx |> shape.Sdf 
-
-/// Shape whose function gets access to the Position object
-let mkShape name fn = { Sdf = fn; Name = name }
-
-let mkShapeBasic name (fn : float2 -> float) 
-    = { Sdf = (fun p -> fn p.Xy) ; Name = name }
-
-//let mkShapeWithMeta name fn = { Sdf = fn; Name = name }
-
-let _circle (r : float) : SdfShape =
-    sdCircle r |> mkShapeBasic (sprintf "circle %f" r)
-
-let _translate (offset : float2) (s1 : SdfShape) : SdfShape =
-    fun (ctx : Position) ->
-        ctx.Offset(offset) |> sdf s1
-    |> mkShape(sprintf "translate [%s] by (%f,%f)" s1.Name (offset.x) (offset.y))
-
-let _add (s1 : SdfShape) (s2 : SdfShape) : SdfShape =
-    s1
-
-let _sub (s1 : SdfShape) (s2 : SdfShape) : SdfShape =
-    fun ctx ->
-        opSubtraction 
-            (sdf s1 ctx) 
-            (sdf s2 ctx)
-    |> mkShape(sprintf "%s-%s" s1.Name s2.Name)
-
-let (+.) = _add
-
-let (-.) = _sub
-
 type Shader = float4 -> float -> float4
 
 let pipe (s1 : Shader) (s2 : Shader) : Shader =

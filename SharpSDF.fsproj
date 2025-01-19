@@ -8,9 +8,9 @@
     <Compile Include="HLSL.fs" />
     <Compile Include="Ast.fs" />
     <Compile Include="Interpreter.fs" />
-    <Compile Include="Compiler.fs" />
     <Compile Include="SDF.fs" />
     <Compile Include="Shaders.fs" />
+    <Compile Include="Compiler.fs" />
     <Compile Include="Colors.fs" />
     <Compile Include="PNG.fs" />
     <Compile Include="ConsoleRenderer.fs" />

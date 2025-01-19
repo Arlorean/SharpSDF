@@ -4,11 +4,11 @@ open SharpSDF.Ast
 
 // type NativeShapeFn = SharpSDF.HLSL.float2 -> float
 
-// type HlslSource = HlslSource of string
-//     with
-//         member __.Source = let (HlslSource s) = __ in s
-//         override __.ToString() = __.Source
-//         static member Of s = HlslSource s
+type HlslSource = HlslSource of string
+    with
+        member __.Source = let (HlslSource s) = __ in s
+        override __.ToString() = __.Source
+        static member Of s = HlslSource s
 
 // [<RequireQualifiedAccess>]
 // type CompilationTarget =
@@ -35,8 +35,8 @@ let compileToInterpreter (shape : Float2 -> Float) : (HLSL.float2 -> float) =
 // let compileToIL (shape : Float2 -> Float) : (HLSL.float2 -> float) =
 //     (fun p -> p.x)
 
-// let compileToHLSL (shape : Float2 -> Float) : HlslSource =
-//     HlslSource.Of "float shape(float2 p) { return float(0); }"
+let compileToHLSL (shape : Float2 -> Float) : HlslSource =
+    HlslSource.Of "float shape(float2 p) { return float(0); }"
 
 // let compileShape (target : CompilationTarget) (fn : Ast.ShapeFn) : CompilationResult =
 //     match target with

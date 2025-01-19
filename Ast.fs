@@ -20,6 +20,7 @@ and [<RequireQualifiedAccess>] Float =
     | Float of float
     | From of Expr
     | Int of int
+    | Negate of (Float)
     | Mul of (Float * Float)
     | Add of (Float * Float)
     | Sub of (Float * Float)
@@ -33,10 +34,12 @@ and [<RequireQualifiedAccess>] Float =
     | If of (Bool * Float * Float)
     | Let of (string * Expr) list  * Float
     static member (-) (v1:Float, v2:Float) = Float.Sub(v1,v2)
+    static member (-) (v1:Float, v2:float) = Float.Sub(v1, Float.Float v2)
     static member (+) (v1:Float, v2:Float) = Float.Add(v1,v2)
     static member inline op_GreaterThan (v1:Float, v2:Float) = Bool.Gt(v1, v2)
     static member inline op_GreaterThan (v1:Float, f : float) = Bool.Gt(v1, Float.Float f)
-    static member Zero = Float.Float 0
+    static member Of (v : float) = Float.Float v
+    static member Zero = Float.Of 0
 
 and [<RequireQualifiedAccess>] Float2 =
     | Float2 of (Float * Float)
@@ -53,10 +56,12 @@ and [<RequireQualifiedAccess>] Float2 =
     | If of (Bool * Float2 * Float2)
     | Let of (string * Expr) list  * Float2
     static member (-) (v1:Float2, v2:Float2) = Float2.Sub2(v1,v2)
+    static member (-) (v1:Float2, v2:HLSL.float2) = Float2.Sub2(v1, Float2.Of v2)
     static member (+) (v1:Float2, v2:Float2) = Float2.Add2(v1,v2)
     member __.x = Float.X __
     member __.y = Float.Y __
     static member Zero = Float2.Float2 (Float.Zero, Float.Zero)
+    static member Of (v : HLSL.float2) = Float2.Float2( Float.Of v.x, Float.Of v.y )
 
 and [<RequireQualifiedAccess>] Expr =
     | F of Float
@@ -76,7 +81,7 @@ let let2_ (defns) (expr) = Float2.Let (defns, expr)
 
 let gt_ a b = Bool.Gt( a, b )
 let gt__ a b = Bool.Gt( a, f1 b )
-    
+
 type private F1 =
     static member internal Length(v:Float) = v
     static member internal Abs(v:Float) = Float.Abs v
@@ -98,3 +103,33 @@ type Intrinsics =
     static member length (v) = F2.Length(v)
     
 type ShapeFn = Float2 -> Float
+
+// Summary:
+// 	•	Union: min(sdf1, sdf2)
+// 	•	Intersection: max(sdf1, sdf2)
+// 	•	Difference: max(sdf1, -sdf2)
+
+let union (a : ShapeFn) (b : ShapeFn) : ShapeFn = 
+    fun (p : Float2) ->
+        Float.Min( p |> a, p |> b ) 
+
+let intersection (a : ShapeFn) (b : ShapeFn) : ShapeFn = 
+    fun (p : Float2) ->
+        Float.Max( p |> a, p |> b ) 
+
+let difference (a : ShapeFn) (b : ShapeFn) : ShapeFn = 
+    fun (p : Float2) ->
+        Float.Max( p |> a, p |> b |> Float.Negate ) 
+
+let (<->) = difference    // Difference just can't be separated from the notion of "subtraction"
+let (<&>) = intersection  // Bits of the shape in A AND B
+// let (<|>) = union         // Bits of the shape in A OR B. Complements intersection / (&) nicely but arguably not as easy to think about as (+)
+let (<+>) = union         // Adding the shapes.
+
+let translate x y (shape : ShapeFn) : ShapeFn = 
+    fun (p : Float2) ->
+        Float2.Add2( p, f2__ x y ) |> shape
+
+let scale (s : float) (shape : ShapeFn) : ShapeFn = 
+    fun (p : Float2) ->
+        Float2.Mul( p, f1 (1.0 / s) ) |> shape

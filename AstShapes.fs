@@ -3,44 +3,51 @@ module SharpSDF.AstShapes
 open Ast
 open type Ast.Intrinsics
 
-let sdCircle (r: Float) (p : Float2) =
-    length p - r
 
+//
+// ShapeFns can be composed. The shapes below take parameters from the F# world and return us a lifted AST shape
+// which can be composed and then eventually evaluated
+//
+// Lower case floatN -> F# world
+// Upper case FloatN -> AST world
+// 
+// Define lots of simple, reusable primitives like "circle" and "roundedbox"
+// Compose them to make higher-level shapes like "snowman"
 
-let sdRoundedBox (hs:Float2) (tr:Float,br:Float,tl:Float,bl:Float) (p:Float2) : Float =
-    
-    let tb = 
-        if2_ (gt__ p.x 0)
-            (f2_  tr br)
-            (f2_  br tr)
-    
-    let t = tb.x
-    let b = tb.y
+let empty : ShapeFn = 
+    fun (_ : Float2) -> f1 (System.Double.MaxValue)
 
-    let r = if_ (gt__ p.y 0) t b
+let circle (r: float) : ShapeFn =
+    fun (p : Float2) ->
+        length p - r
 
-    let q = 
-        (f2_ (abs p.x) (abs p.y))
-        - hs
-        + (f2_ r r)
+let snowman : ShapeFn =
+    circle 40
+    <+>
+    (circle 60 |> translate 0 70)
+    |> translate 0 -40
 
-    let a =
-        min (max (q.x,q.y), f1 0)
+let roundedBox (hs:HLSL.float2) (tr:float,br:float,tl:float,bl:float) : ShapeFn =
+    fun (p : Float2) ->        
+        let tb = 
+            if2_ (gt__ p.x 0)
+                (f2__  tr br)
+                (f2__  br tr)
+        
+        let t = tb.x
+        let b = tb.y
 
-    let b = 
-        max (q, Float2.Zero) |> length 
+        let r = if_ (gt__ p.y 0) t b
 
-    (a + b - r)
+        let q = 
+            (f2_ (abs p.x) (abs p.y))
+            - hs
+            + (f2_ r r)
 
-// Create an SdfShape from an AST shape function. SdfShapes can be passed to the "sdf" function
-let make (name : string) (shape : Ast.ShapeFn) : Shaders.SdfShape = 
-    shape |> Compiler.compileToInterpreter |> Shaders.mkShapeBasic name
+        let a =
+            min (max (q.x,q.y), f1 0)
 
-let sdRoundedBox_ (hs : HLSL.float2) (tr:float,br:float,tl:float,bl:float) =
-    sdRoundedBox (f2 hs) (f1 tr, f1 br, f1 tl, f1 bl) 
-    |> make (sprintf "rounded-box %f,%f" hs.x hs.y)
+        let b = 
+            max (q, Float2.Zero) |> length 
 
-let sdCircle_ (r : float) = 
-    sdCircle (f1 r) 
-    |> make (sprintf "circle %f" r)
-
+        (a + b - r)

@@ -18,7 +18,6 @@ type Bool =
 and [<RequireQualifiedAccess>] Float =
     | Var of string
     | Float of float
-    | From of Expr
     | Int of int
     | Negate of (Float)
     | Mul of (Float * Float)
@@ -32,7 +31,6 @@ and [<RequireQualifiedAccess>] Float =
     | X of Float2
     | Y of Float2
     | If of (Bool * Float * Float)
-    | Let of (string * Expr) list  * Float
     static member (-) (v1:Float, v2:Float) = Float.Sub(v1,v2)
     static member (-) (v1:Float, v2:float) = Float.Sub(v1, Float.Float v2)
     static member (+) (v1:Float, v2:Float) = Float.Add(v1,v2)
@@ -43,7 +41,6 @@ and [<RequireQualifiedAccess>] Float =
 
 and [<RequireQualifiedAccess>] Float2 =
     | Float2 of (Float * Float)
-    | From of Expr
     | Mul of (Float2 * Float)
     | Add of (Float2 * Float)
     | Sub of (Float2 * Float)
@@ -54,7 +51,6 @@ and [<RequireQualifiedAccess>] Float2 =
     | Min of Float2 * Float2
     | Max of Float2 * Float2
     | If of (Bool * Float2 * Float2)
-    | Let of (string * Expr) list  * Float2
     static member (-) (v1:Float2, v2:Float2) = Float2.Sub2(v1,v2)
     static member (-) (v1:Float2, v2:HLSL.float2) = Float2.Sub2(v1, Float2.Of v2)
     static member (+) (v1:Float2, v2:Float2) = Float2.Add2(v1,v2)
@@ -63,21 +59,14 @@ and [<RequireQualifiedAccess>] Float2 =
     static member Zero = Float2.Float2 (Float.Zero, Float.Zero)
     static member Of (v : HLSL.float2) = Float2.Float2( Float.Of v.x, Float.Of v.y )
 
-and [<RequireQualifiedAccess>] Expr =
-    | F of Float
-    | F2 of Float2
-    | B of Bool
-
 let f1 (value) = Float.Float value
 let f2 (value : HLSL.float2) = Float2.Float2 (f1 value.x, f1 value.y)
 let f2_ x y = Float2.Float2 (x,y)
 let f2__ x y = Float2.Float2 (f1 x, f1 y)
 
 let v_ (name) = Float.Var name
-let let_ (defns) (expr) = Float.Let (defns, expr)
 let if_ c t f = Float.If (c, t, f)
 let if2_ c t f = Float2.If (c, t, f)
-let let2_ (defns) (expr) = Float2.Let (defns, expr)
 
 let gt_ a b = Bool.Gt( a, b )
 let gt__ a b = Bool.Gt( a, f1 b )

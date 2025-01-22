@@ -13,62 +13,53 @@ type Expr(op:Op) =
     member this.Dot([<CallerMemberName;Optional;DefaultParameterValue("")>] memberName:string) = 
         Dot(this, memberName)
 
+and UnaryFn =
+    | Abs
+    | Exp
+    | Plus
+    | Minus
+and BinaryFn =
+    | Add
+    | Sub
+    | Mul
+    | Div
+    | Rem
+    | Min
+    | Max
+    | Step
+and TernaryFn =
+    | Clamp
+    | Lerp
+    | Smoothstep
+and ComparisonFn =
+    | EQ
+    | NE
+    | LT
+    | GT
+    | LE
+    | GE
 and Op =
     // Literals
     | Float of System.Double
     | Bool of System.Boolean
     | Int of System.Int32
-    | Vector of Expr[]
+    | FloatN of System.Double[]
     // Binary Arithmetic
-    | Mul of Expr * Expr
-    | Div of Expr * Expr
-    | Rem of Expr * Expr
-    | Add of Expr * Expr
-    | Sub of Expr * Expr
-    | Shl of Expr * Expr
-    | Shr of Expr * Expr
-    | And of Expr * Expr
-    | Xor of Expr * Expr
-    | Or of Expr * Expr
-    | LAnd of Expr * Expr
-    | LOr of Expr * Expr
-    | UDiv of Expr * Expr
-    | URem of Expr * Expr
-    | UShr of Expr * Expr
-    // Binary Comparison
-    | LT of Expr * Expr
-    | GT of Expr * Expr
-    | LE of Expr * Expr
-    | GE of Expr * Expr 
-    | EQ of Expr * Expr
-    | NE of Expr * Expr
-    | ULT of Expr * Expr
-    | UGT of Expr * Expr
-    | ULE of Expr * Expr
-    | UGE of Expr * Expr
-    // Unary
-    | PostInc of Expr
-    | PostDec of Expr
-    | PreInc of Expr
-    | PreDec of Expr
-    | Plus of Expr
-    | Minus of Expr
-    | Not of Expr
-    | LNot of Expr
+    | Unary of UnaryFn * Expr
+    | Binary of BinaryFn * Expr * Expr
+    | Ternary of TernaryFn * Expr * Expr * Expr
+    | Comparison of ComparisonFn * Expr * Expr // Returns bool[N]
     // Special
-    | Dot of Expr*string
     | IfThenElse of Expr * Expr * Expr
-    // Intrinsics
-    | Abs of Expr 
-    | Max of Expr*Expr 
-    | Min of Expr*Expr 
-    | Length of Expr 
+    | Vector of Expr[]
+    | Length of Expr
+    | Dot of Expr * string
 
 type bool =
     inherit Expr
     new (v) = { inherit Expr(Bool(v)) }
     internal new (op:Op) = { inherit Expr(op) }
-    static member Result(op:Op) = bool(op)
+    static member Wrap(op:Op) = bool(op)
     static member op_Implicit(v:Boolean) = bool(v)
 
 type int =
@@ -85,13 +76,13 @@ type float =
     static member Wrap(op:Op) = float(op)
     static member op_Implicit(v:Double) = float(v)
     static member op_Implicit(v:Int32) = float(v)
-    static member (~+) (v:float) = float(Plus(v))
-    static member (~-) (v:float) = float(Minus(v))
-    static member (+) (v1:float, v2:float) = float(Add(v1,v2))
-    static member (-) (v1:float, v2:float) = float(Sub(v1,v2))
-    static member op_GreaterThan (v1:float, v2:float) = bool.Result(GT(v1,v2))
-    static member (!=) (v1:float, v2:float) = bool(NE(v1,v2))
-    static member (==) (v1:float, v2:float) = bool(EQ(v1,v2))
+    static member (~+) (v:float) = float(Unary(Plus,v))
+    static member (~-) (v:float) = float(Unary(Minus,v))
+    static member (+)  (v1:float, v2:float) = float(Binary(Add,v1,v2))
+    static member (-)  (v1:float, v2:float) = float(Binary(Sub,v1,v2))
+    static member op_GreaterThan (v1:float, v2:float) = bool(Comparison(GT,v1,v2))
+    static member op_Inequality (v1:float, v2:float) = bool(Comparison(NE,v1,v2))
+    static member op_Equality (v1:float, v2:float) = bool(Comparison(EQ,v1,v2))
 
 
 type float2 =
@@ -106,15 +97,15 @@ type float2 =
     static member op_Implicit(v:Double) = float2(v)
     member this.x = float(this.Dot())
     member this.y = float(this.Dot())
-    static member (+) (v1:float2, v2:float) = float2(Add(v1,float2(v2)))
-    static member (-) (v1:float2, v2:float) = float2(Sub(v1,float2(v2)))
-    static member (*) (v1:float2, v2:float) = float2(Mul(v1,float2(v2)))
-    static member (/) (v1:float2, v2:float) = float2(Div(v1,float2(v2)))
-    static member (+) (v1:float2, v2:float*float) = float2(Add(v1,float2(v2)))
-    static member (+) (v1:float2, v2:float2) = float2(Add(v1,v2))
-    static member (-) (v1:float2, v2:float2) = float2(Sub(v1,v2))
-    static member (*) (v1:float2, v2:float2) = float2(Mul(v1,v2))
-    static member (/) (v1:float2, v2:float2) = float2(Div(v1,v2))
+    static member (+) (v1:float2, v2:float) = float2(Binary(Add,v1,float2(v2)))
+    static member (-) (v1:float2, v2:float) = float2(Binary(Sub,v1,float2(v2)))
+    static member (*) (v1:float2, v2:float) = float2(Binary(Mul,v1,float2(v2)))
+    static member (/) (v1:float2, v2:float) = float2(Binary(Div,v1,float2(v2)))
+    static member (+) (v1:float2, v2:float*float) = float2(Binary(Add,v1,float2(v2)))
+    static member (+) (v1:float2, v2:float2) = float2(Binary(Add,v1,v2))
+    static member (-) (v1:float2, v2:float2) = float2(Binary(Sub,v1,v2))
+    static member (*) (v1:float2, v2:float2) = float2(Binary(Mul,v1,v2))
+    static member (/) (v1:float2, v2:float2) = float2(Binary(Div,v1,v2))
 
 
 type float3 = 
@@ -165,8 +156,8 @@ let inline (?<|) (cond:bool) (t:'T,f:'T) = Wrap<'T>(IfThenElse(cond,t,f))
 
 
 type Intrinsics =
-    static member inline abs (v:'T):'T = Wrap(Abs(v))
+    static member inline abs (v:'T):'T = Wrap(Unary(Abs,v))
     static member inline length (v:'T):float = Wrap(Length(v))
-    static member inline max (v1:'T,v2:'T):'T = Wrap(Max(v1,v2))
-    static member inline min (v1:'T,v2:'T):'T = Wrap(Min(v1,v2))
+    static member inline max (v1:'T,v2:'T):'T = Wrap(Binary(Max,v1,v2))
+    static member inline min (v1:'T,v2:'T):'T = Wrap(Binary(Min,v1,v2))
 

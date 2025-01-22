@@ -9,7 +9,7 @@ let sdfShader =
     innerShadow gray50 30.0 |>> 
     solidStroke red 20.0
 
-#if !USE_AST2
+#if !!USE_AST2
 open Ast
 open AstShapes
 open Compiler

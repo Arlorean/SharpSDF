@@ -8,11 +8,19 @@ let sdfShader =
     solidFill blue |>> 
     innerShadow gray50 30.0 |>> 
     solidStroke red 20.0
-    
+
+#if !USE_AST2
 open Ast
 open AstShapes
+open Compiler
+#else
+open Ast2
+open AstShapes2
+open Compiler2
+let f1 (v:System.Double) = float(v)
+#endif
 
-let snowman : ShapeFn =
+let snowman =
     circle 40
     <+>
     (circle 60 |> translate 0 70)
@@ -38,5 +46,5 @@ let background = transparent
 
 let shader position =
     position 
-    |> (shape |> Compiler.compileToInterpreter)
+    |> (shape |> compileToInterpreter)
     |> sdfShader background

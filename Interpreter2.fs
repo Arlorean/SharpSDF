@@ -26,14 +26,6 @@ with
         | Float v -> v
         | _ -> failwithf "%A is not a Float" v
 
-
-    static member Unary () (v:Value) = 
-        match v with
-        | Int v -> Int +v
-        | Float v -> Float +v
-        | Vector v -> Vector (Array.map (Value.Plus) v)
-        | _ -> Value.ERROR
-
     static member Plus (v:Value) = 
         match v with
         | Int v -> Int +v

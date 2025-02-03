@@ -32,8 +32,8 @@ let snowScene : ShapeFn =
     ) empty
     |> translate 160 0
 
-//let private shape :ShapeFn = snowScene
-let shape :ShapeFn = circle 40
+let private shape :ShapeFn = snowScene
+//let shape :ShapeFn = circle 40
 
 let background = transparent
 

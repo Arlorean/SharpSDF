@@ -2,19 +2,6 @@ module SharpSDF.Interpreter2
 
 open System
 
-type Intrinsics =
-    static member internal Abs(v:float) = Math.Abs(v)
-    static member internal Clamp (v:float) min max = Math.Clamp(v,min,max)
-    static member internal Exp(v:float) = Math.Exp(v)
-    static member internal Lerp v1 v2 (t:float) = v1 + t*(v2-v1)
-    static member internal Min(v1:float) (v2:float) = Math.Min(v1, v2)
-    static member internal Max(v1:float) (v2:float) = Math.Max(v1, v2)
-    static member internal Smoothstep min max (v:float) =
-        let t = Math.Clamp ((v - min) / (max - min), 0.0, 1.0)
-        t*t*(3.0-2.0*t)
-    static member internal Step(v1:float) (v2:float) = if v1 >= v2 then 1.0 else 0.0
-
-
 [<RequireQualifiedAccessAttribute>]
 type Value = 
     | Bool of bool

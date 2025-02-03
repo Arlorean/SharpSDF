@@ -24,6 +24,22 @@ type Value =
 with
     static member inline ERROR = raise (NotSupportedException())
 
+    static member inline ToBool(v:Value) = 
+        match v with
+        | Bool v -> v
+        | _ -> failwithf "%A is not a Bool" v
+
+    static member inline op_Explicit(v:Value) = 
+        match v with
+        | Int v -> v
+        | _ -> failwithf "%A is not a Int" v
+
+    static member inline op_Explicit(v:Value) = 
+        match v with
+        | Float v -> v
+        | _ -> failwithf "%A is not a Float" v
+
+
     static member Unary () (v:Value) = 
         match v with
         | Int v -> Int +v
@@ -163,6 +179,39 @@ with
         | Vector v1, Vector v2 -> Vector (Array.map2 Value.GE v1 v2)
         | _ -> Value.ERROR
 
+    static member AND (v1:Value) (v2:Value) = 
+        match (v1,v2) with
+        | Bool v1, Bool v2 -> Bool (v1&&v2)
+        | Vector v1, Vector v2 -> Vector (Array.map2 Value.AND v1 v2)
+        | _ -> Value.ERROR
+
+    static member OR (v1:Value) (v2:Value) = 
+        match (v1,v2) with
+        | Bool v1, Bool v2 -> Bool (v1||v2)
+        | Vector v1, Vector v2 -> Vector (Array.map2 Value.OR v1 v2)
+        | _ -> Value.ERROR
+
+    static member Clamp (v:Value) (min:Value) (max:Value) = 
+        match (v,min,max) with
+        | Int v, Int min, Int max -> Int (Math.Clamp(v,min,max))
+        | Float v, Float min, Float max -> Float (Math.Clamp(v,min,max))
+        | Vector v, Vector min, Vector max -> Vector (Array.map3 Value.Clamp v min max)
+        | _ -> Value.ERROR
+
+    static member Lerp (v1:Value) (v2:Value) (t:Value) = 
+        match (v1,v2,t) with
+        | Float v1, Float v2, Float t -> Float (v1 + t*(v2-v1))
+        | Vector v1, Vector v2, Vector t -> Vector (Array.map3 Value.Lerp v1 v2 t)
+        | _ -> Value.ERROR
+
+    static member Smoothstep (min:Value) (max:Value) (v:Value) = 
+        match (min,max,v) with
+        | Float min, Float max, Float v ->  
+            let t = Math.Clamp ((v - min) / (max - min), 0.0, 1.0)
+            Float (t*t*(3.0-2.0*t))
+        | Vector min, Vector max, Vector v -> Vector (Array.map3 Value.Smoothstep min max v)
+        | _ -> Value.ERROR
+
     static member Swizzle (v:Value[]) s = 
         match s with
         | "x" | "r" -> v[0]
@@ -178,21 +227,6 @@ with
         | Vector v -> Value.Swizzle v s
         | _ -> Value.ERROR
 
-    static member inline ToBool(v:Value) = 
-        match v with
-        | Bool v -> v
-        | _ -> failwithf "%A is not a Bool" v
-
-    static member inline op_Explicit(v:Value) = 
-        match v with
-        | Int v -> v
-        | _ -> failwithf "%A is not a Int" v
-
-    static member inline op_Explicit(v:Value) = 
-        match v with
-        | Float v -> v
-        | _ -> failwithf "%A is not a Float" v
-
     static member Length (v:Value) =
         match v with
         | Vector v ->
@@ -201,7 +235,6 @@ with
             |> Math.Sqrt
             |> Float
         | _ -> failwithf "%A is not a Vector" v
-
 
 type Operator =
     static member internal Fn(fn:Ast2.UnaryFn) = 
@@ -220,19 +253,19 @@ type Operator =
         | Ast2.Min -> Value.Min
         | Ast2.Max -> Value.Max
         | Ast2.Step -> Value.Step
-    // static member internal Fn(fn:Ast2.TernaryFn) = 
-    //     match fn with
-    //     | Ast2.Clamp -> Value.Clamp
-    //     | Ast2.Lerp -> Value.Lerp
-    //     | Ast2.Smoothstep -> Value.Smoothstep
-    static member internal Fn(fn:Ast2.ComparisonFn) = 
-        match fn with
         | Ast2.EQ -> Value.EQ
         | Ast2.NE -> Value.NE
         | Ast2.LT -> Value.LT
         | Ast2.GT -> Value.GT
         | Ast2.LE -> Value.LE
         | Ast2.GE -> Value.GE
+        | Ast2.AND -> Value.AND
+        | Ast2.OR -> Value.OR
+    static member internal Fn(fn:Ast2.TernaryFn) = 
+        match fn with
+        | Ast2.Clamp -> Value.Clamp
+        | Ast2.Lerp -> Value.Lerp
+        | Ast2.Smoothstep -> Value.Smoothstep
 
 let rec Eval(expr:Ast2.Expr):Value =
     match expr.op with
@@ -240,14 +273,12 @@ let rec Eval(expr:Ast2.Expr):Value =
     | Ast2.Int (v) -> Value.Int v
     | Ast2.Float (v) -> Value.Float v
     | Ast2.Vector (v) -> Value.Vector (Array.map Eval v)
+    | Ast2.Length (v) -> Eval(v) |> Value.Length
     | Ast2.Unary (op, v) -> Eval(v) |> (Operator.Fn op)
     | Ast2.Binary (op, v1, v2) -> (Eval(v1), Eval(v2)) ||> (Operator.Fn op)
-    // | Ast2.Ternary (op, v1, v2, v3) -> (Eval(v1), Eval(v2), Eval(v3)) |||> (Operator.Fn op)
-    | Ast2.Comparison (op, v1, v2) -> (Eval(v1), Eval(v2)) ||> (Operator.Fn op)
-    | Ast2.Length (v) -> Eval(v) |> Value.Length
+    | Ast2.Ternary (op, v1, v2, v3) -> (Eval(v1), Eval(v2), Eval(v3)) |||> (Operator.Fn op)
     | Ast2.IfThenElse (cond, t, f) -> if (Eval(cond)|>Value.ToBool) then Eval(t) else Eval(f)
     | Ast2.Dot (v, s) -> Eval(v) |> Value.Dot s
-    | _ -> failwithf "Not implemented: Eval(%A) = " expr.op
 
 let compileToInterpreter (shader : Ast2.float2 -> Ast2.float4) : (HLSL.float2 -> HLSL.float4) =
     fun (p : HLSL.float2) -> 

@@ -45,7 +45,7 @@ let solidStroke (strokeColor:Color) (strokeWidth : float) : Shader =
 let shadow (shadowColor:Color) (shadowWidth:float) : Shader =
     fun (background:Color) (sd:SignedDistance) ->
         let alpha :float = invLerp(shadowWidth, 0, sd)
-        If (alpha >= 0.0) (// && alpha .<= 1.0) (
+        If (alpha >= 0.0 && alpha <= 1.0) (
             let falloff = alpha*alpha
             let shadow = Color(shadowColor.rgb, shadowColor.a*falloff)
             blend shadow background

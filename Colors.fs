@@ -1,6 +1,6 @@
 module SharpSDF.Colors
 
-open HLSL
+open Ast2
 
 let transparent    = float4(0,0,0,0) 
 

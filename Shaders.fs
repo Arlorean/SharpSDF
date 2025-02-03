@@ -1,21 +1,17 @@
-module SharpSDF.Shaders
+module SharpSDF.ShapeShaders
 
-open SharpSDF.HLSL
-
-open type HLSL.Intrinsics
-
-type IShader =
-    abstract render: distance:float -> float4
+open Ast2
+open type Intrinsics
 
 type SignedDistance = float
 type Color = float4
 type Position = float2
 
 type ShapeFn = Position -> SignedDistance   // Native shape function
-type ShaderFn = SignedDistance -> Color
-type Shader = float4 -> float -> float4
+type ShapeColorFn = SignedDistance -> Color
+type ShapeBlendFn = Color -> SignedDistance -> Color
 
-let pipe (s1 : Shader) (s2 : Shader) : Shader =
+let pipe (s1 : ShapeBlendFn) (s2 : ShapeBlendFn) : ShapeBlendFn =
     fun p d ->
         let p2 = s1 p d
         let p3 = s2 p2 d
@@ -23,8 +19,8 @@ let pipe (s1 : Shader) (s2 : Shader) : Shader =
 
 let (|>>) = pipe
 
-let solidFill (fillColor : float4) : Shader = 
-    fun (background : float4) (sd : float) ->
+let solidFill (fillColor : Color) : ShapeBlendFn = 
+    fun (background : Color) (sd : SignedDistance) ->
         if (sd < 0) then
             fillColor
         else 
@@ -36,11 +32,11 @@ let inline invLerp<'T when
     > (v1:'T, v2:'T, v:'T) =
     (v - v1) / (v2 - v1)
 
-let blend (src:float4) (dst:float4) = 
+let blend (src:Color) (dst:Color) = 
     float4(dst.rgb*(1.0-src.a) + src.rgb*(src.a), min(src.a+dst.a, 1.0))
 
-let solidStroke (strokeColor : float4) (strokeWidth : float) : Shader =
-    fun (background : float4) (sd : float) ->
+let solidStroke (strokeColor:Color) (strokeWidth:float) :ShapeBlendFn =
+    fun (background:Color) (sd:SignedDistance) ->
         let hw: float = strokeWidth/2.0
         let d = abs(sd);
         if (d <= hw) then
@@ -51,8 +47,8 @@ let solidStroke (strokeColor : float4) (strokeWidth : float) : Shader =
         else
             background
 
-let shadow (shadowColor : float4) (shadowWidth : float) : Shader =
-    fun (background : float4) (sd : float) ->
+let shadow (shadowColor:Color) (shadowWidth : float) : ShapeBlendFn =
+    fun (background:Color) (sd:SignedDistance) ->
         let alpha = invLerp(shadowWidth, 0, sd)
         if (alpha >= 0.0 && alpha <= 1.0) then
             let falloff = alpha*alpha
@@ -61,8 +57,8 @@ let shadow (shadowColor : float4) (shadowWidth : float) : Shader =
         else 
             background
 
-let outerShadow (shadowColor : float4) (shadowWidth : float) : Shader =
+let outerShadow (shadowColor:Color) (shadowWidth:float) :ShapeBlendFn =
     shadow shadowColor (+shadowWidth)
 
-let innerShadow (shadowColor : float4) (shadowWidth : float) : Shader =
+let innerShadow (shadowColor:Color) (shadowWidth:float) :ShapeBlendFn =
     shadow shadowColor (-shadowWidth)

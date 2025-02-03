@@ -8,23 +8,23 @@
     <!-- <DefineConstants>$(DefineConstants);FABLE_COMPILER;</DefineConstants> -->
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="HLSL.fs" />
-    <Compile Include="Ast.fs" />
+    <!-- <Compile Include="ShaderGenerator.fs" /> -->
+    <!-- <Compile Include="Ast.fs" /> -->
     <Compile Include="Ast2.fs" />
-    <Compile Include="Interpreter.fs" />
-    <Compile Include="Interpreter2.fs" />
-    <Compile Include="SDF.fs" />
-    <Compile Include="Shaders.fs" />
-    <Compile Include="Compiler.fs" />
-    <Compile Include="Compiler2.fs" />
+    <Compile Include="AstShapes2.fs" />
+    <!-- <Compile Include="Interpreter.fs" /> -->
+    <!-- <Compile Include="SDF.fs" /> -->
+    <!-- <Compile Include="Compiler.fs" /> -->
     <Compile Include="Colors.fs" />
+    <Compile Include="HLSL.fs" />
+    <Compile Include="Interpreter2.fs" />
     <Compile Include="PNG.fs" />
     <Compile Include="ConsoleRenderer.fs" />
+    <!-- <Compile Include="WebGLRenderer.fs" /> -->
+    <Compile Include="ShapeShaders.fs" />
     <Compile Include="CanvasRenderer.fs" />
-    <Compile Include="WebGLRenderer.fs" />
-    <Compile Include="ShaderGenerator.fs" />
-    <Compile Include="AstShapes.fs" />
-    <Compile Include="AstShapes2.fs" />
+    <!-- <Compile Include="ShaderGenerator.fs" /> -->
+    <!-- <Compile Include="AstShapes.fs" /> -->
     <Compile Include="TestShader.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

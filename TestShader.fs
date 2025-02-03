@@ -1,24 +1,16 @@
 module SharpSDF.TestShader
 
+open Ast2
+open AstShapes2
+
 open Shaders
 open Colors
 
-let sdfShader =
+let sdfShader :Shader =
     outerShadow gray50 30.0 |>>
     solidFill blue |>> 
     innerShadow gray50 30.0 |>> 
     solidStroke red 20.0
-
-#if !!USE_AST2
-open Ast
-open AstShapes
-open Compiler
-#else
-open Ast2
-open AstShapes2
-open Compiler2
-let f1 (v:System.Double) = float(v)
-#endif
 
 let snowman =
     circle 40
@@ -29,22 +21,21 @@ let snowman =
 let smallerSnowman = 
     snowman |> scale 0.7
 
-let snowScene =
+let snowScene : ShapeFn =
     [1.0 .. 5.0]
     |> List.fold (fun shape i ->
         shape <+>
         (smallerSnowman 
-            |> scale (f1 (1.0/ i))
-            |> translate (f1 (i * -58.0)) 0
+            |> scale (1.0/ i)
+            |> translate (i * -58.0) 0
         )
     ) empty
     |> translate 160 0
 
-let private shape = snowScene
+//let private shape :ShapeFn = snowScene
+let shape :ShapeFn = circle 40
 
 let background = transparent
 
 let shader position =
-    position 
-    |> (shape |> compileToInterpreter)
-    |> sdfShader background
+    position |> shape |> sdfShader background

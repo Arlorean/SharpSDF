@@ -1,7 +1,6 @@
 module SharpSDF.ConsoleRenderer
 
-open SharpSDF
-open SharpSDF.HLSL
+open HLSL
 
 type ConsoleRenderer(width:int, height:int) =
     let width = width    

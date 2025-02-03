@@ -2,6 +2,8 @@ module SharpSDF.HLSL
 
 open System
 
+type float = System.Double
+
 [<Struct>]
 type float2 =    
     val mutable x : float

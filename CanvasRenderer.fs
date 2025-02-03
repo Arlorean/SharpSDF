@@ -3,7 +3,7 @@ module SharpSDF.CanvasRenderer
 open Browser.Types
 open Browser
 
-open SharpSDF.HLSL
+open HLSL
 
 type CanvasRenderer =
     val private canvas: HTMLCanvasElement
@@ -29,7 +29,6 @@ type CanvasRenderer =
         let height = int this.imageData.height
         let size: float2 = new float2(width,height)
         let halfSize = size * 0.5
-        console.log size
         for y in 0 .. height - 1 do
         for x in 0 .. width - 1 do
             let pixel = float2(x, y)

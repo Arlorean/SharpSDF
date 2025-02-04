@@ -10,10 +10,10 @@ type Expr(op:Op) =
     member this.Dot([<CallerMemberName;Optional;DefaultParameterValue("")>] memberName:string) = 
         Dot(this, memberName)
 
-and IWrappable<^T when ^T :> Expr and ^T :> IWrappable<^T> > = 
-    static abstract member Wrap: Op -> ^T
+and IWrappable<'T when 'T :> Expr and 'T :> IWrappable<'T> > = 
+    static abstract member Wrap: Op -> 'T
 
-and IOneOrMoreOf<^T when ^T :> Expr and ^T :> IWrappable<^T> > =
+and IOneOrMoreOf<'T when 'T :> Expr and 'T :> IWrappable<'T> > =
     interface end
     
 and UnaryFn =
@@ -88,9 +88,9 @@ and [<Sealed>] float =
     static member op_Implicit(v:Double) = float(v)
     static member op_Implicit(v:Int32) = float(v)
 
-and [<Sealed>] vector2<^T when 'T:>IWrappable<'T> and 'T:>Expr > = 
+and [<Sealed>] vector2<'T when 'T:>IWrappable<'T> and 'T:>Expr > = 
     inherit Expr
-    interface IOneOrMoreOf<^T>
+    interface IOneOrMoreOf<'T>
     interface IWrappable<vector2<'T>> with
         static member Wrap(op:Op) = vector2(op)
     static member WrapBool(op:Op) = vector2<bool>(op)
@@ -104,7 +104,7 @@ and [<Sealed>] vector2<^T when 'T:>IWrappable<'T> and 'T:>Expr > =
 
 and [<Sealed>] vector3<'T when 'T:>IWrappable<'T> and 'T:>Expr> = 
     inherit Expr
-    interface IOneOrMoreOf<^T>
+    interface IOneOrMoreOf<'T>
     interface IWrappable<vector3<'T>> with
         static member Wrap(op:Op) = vector3(op)
     static member WrapBool(op:Op) = vector3<bool>(op)
@@ -119,7 +119,7 @@ and [<Sealed>] vector3<'T when 'T:>IWrappable<'T> and 'T:>Expr> =
 
 and vector4<'T when 'T:>IWrappable<'T> and 'T:>Expr> = 
     inherit Expr
-    interface IOneOrMoreOf<^T>
+    interface IOneOrMoreOf<'T>
     interface IWrappable<vector4<'T>> with
         static member Wrap(op:Op) = vector4(op)
     static member WrapBool(op:Op) = vector4<bool>(op)
@@ -155,7 +155,7 @@ type float3 = vector3<float>
 type float4 = vector4<float>
 
 // Create a typesafe wrapper for a generic Op e.g. float, float2, etc.
-let inline Wrap<^T when ^T:>IWrappable<^T>> (op:Op) :^T = 'T.Wrap(op)
+let inline Wrap<'T when 'T:>IWrappable<'T>> (op:Op) :'T = 'T.Wrap(op)
 
 let inline (~+) (v:'T) :'T = Wrap(Unary(Plus,v))
 let inline (~-) (v:'T) :'T = Wrap(Unary(Minus,v))
@@ -164,17 +164,17 @@ let inline (-) (v1:'T) (v2:'T) :'T = Wrap(Binary(Sub,v1,v2))
 let inline (*) (v1:'T) (v2:'T) :'T = Wrap(Binary(Mul,v1,v2))
 let inline (/) (v1:'T) (v2:'T) :'T = Wrap(Binary(Div,v1,v2))
 
-let inline WrapBool<^T,^U when ^T:(static member WrapBool: Op -> ^U)> (op:Op) : ^U = 'T.WrapBool(op)
+let inline WrapBool<'T,'U when 'T:(static member WrapBool: Op -> 'U)> (op:Op) : 'U = 'T.WrapBool(op)
 
-let inline (==) (v1:^T) (v2:^T) = WrapBool<^T,^U>(Binary(EQ,v1,v2))
-let inline (!=) (v1:'T) (v2:'T) = WrapBool<^T,^U>(Binary(NE,v1,v2))
-let inline (<) (v1:'T) (v2:'T) = WrapBool<^T,^U>(Binary(LT,v1,v2))
-let inline (>) (v1:'T) (v2:'T) = WrapBool<^T,^U>(Binary(GT,v1,v2))
-let inline (<=) (v1:'T) (v2:'T) = WrapBool<^T,^U>(Binary(LT,v1,v2))
-let inline (>=) (v1:'T) (v2:'T) = WrapBool<^T,^U>(Binary(GE,v1,v2))
+let inline (==) (v1:'T) (v2:'T) = WrapBool<'T,'U>(Binary(EQ,v1,v2))
+let inline (!=) (v1:'T) (v2:'T) = WrapBool<'T,'U>(Binary(NE,v1,v2))
+let inline (<) (v1:'T) (v2:'T) = WrapBool<'T,'U>(Binary(LT,v1,v2))
+let inline (>) (v1:'T) (v2:'T) = WrapBool<'T,'U>(Binary(GT,v1,v2))
+let inline (<=) (v1:'T) (v2:'T) = WrapBool<'T,'U>(Binary(LT,v1,v2))
+let inline (>=) (v1:'T) (v2:'T) = WrapBool<'T,'U>(Binary(GE,v1,v2))
 
-let inline (&&) (v1:^T) (v2:^T) : ^T when ^T:>Expr and ^T:>IOneOrMoreOf<bool> = WrapBool<^T,^T>(Binary(AND,v1,v2))
-let inline (||) (v1:^T) (v2:^T) : ^T when ^T:>Expr and ^T:>IOneOrMoreOf<bool> = WrapBool<^T,^T>(Binary(OR,v1,v2))
+let inline (&&) (v1:'T) (v2:'T) : 'T when 'T:>Expr and 'T:>IOneOrMoreOf<bool> = WrapBool<'T,'T>(Binary(AND,v1,v2))
+let inline (||) (v1:'T) (v2:'T) : 'T when 'T:>Expr and 'T:>IOneOrMoreOf<bool> = WrapBool<'T,'T>(Binary(OR,v1,v2))
 
 
 // Syntax for (if...then...else)
@@ -190,7 +190,9 @@ let inline min (v1:'T,v2:'T):'T = Wrap(Binary(Min,v1,v2))
 let inline invLerp (v1:'T, v2:'T, v:'T) :'T =
     (v - v1) / (v2 - v1)
 
-    
+
+let foo (a:float2) = float3(a.x,a.y,0)
+
 let v1 = float4(1,2,3,4)
 let v2 = float4(1,2,3,5)
 let c = (v1==v2)
@@ -199,3 +201,4 @@ let l = length v1
 let f1 = float(1.0)
 let f2 = float(2.0)
 let d = (f1==f2)
+

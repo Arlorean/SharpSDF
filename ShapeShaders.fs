@@ -37,11 +37,6 @@ let solidStroke (strokeColor:Color) (strokeWidth : float) : Shader =
         ,
             background)
 
-#nowarn 86
-
-//let inline (>=) (v1:float, v2:float) :bool = bool(Bool true)
-
-
 let shadow (shadowColor:Color) (shadowWidth:float) : Shader =
     fun (background:Color) (sd:SignedDistance) ->
         let alpha :float = invLerp(shadowWidth, 0, sd)

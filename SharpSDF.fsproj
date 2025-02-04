@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <!-- Ignore Implicit Conversions Warning -->
-    <NoWarn>FS3391, FS0343</NoWarn>
+    <NoWarn>FS0086, FS3535, FS3391, FS0343</NoWarn>
     <!-- Uncomment this if you "need" to see FABLE_COMPILER specific code highlighted in VS Code -->
     <!-- <DefineConstants>$(DefineConstants);FABLE_COMPILER;</DefineConstants> -->
   </PropertyGroup>

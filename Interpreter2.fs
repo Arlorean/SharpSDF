@@ -16,12 +16,12 @@ with
         | Bool v -> v
         | _ -> failwithf "%A is not a Bool" v
 
-    static member inline op_Explicit(v:Value) = 
+    static member inline ToInt(v:Value) = 
         match v with
         | Int v -> v
         | _ -> failwithf "%A is not a Int" v
 
-    static member inline op_Explicit(v:Value) = 
+    static member inline ToFloat(v:Value) = 
         match v with
         | Float v -> v
         | _ -> failwithf "%A is not a Float" v
@@ -209,7 +209,7 @@ with
     static member Length (v:Value) =
         match v with
         | Vector v ->
-            Array.map (fun v -> float v * float v) v
+            Array.map (fun v -> Value.ToFloat(v) *  Value.ToFloat(v)) v
             |> Array.sum 
             |> Math.Sqrt
             |> Float

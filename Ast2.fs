@@ -1,8 +1,5 @@
 module SharpSDF.Ast2
 
-#nowarn 86
-#nowarn 3535
-
 open System
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices

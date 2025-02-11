@@ -8,16 +8,12 @@
     <!-- <DefineConstants>$(DefineConstants);FABLE_COMPILER;</DefineConstants> -->
   </PropertyGroup>
   <ItemGroup>
-    <!-- <Compile Include="ShaderGenerator.fs" /> -->
-    <!-- <Compile Include="Ast.fs" /> -->
-    <Compile Include="Ast2.fs" />
+    <Compile Include="Ast3.fs" />
+    <Compile Include="Wrappers.fs" />
     <Compile Include="AstShapes2.fs" />
-    <!-- <Compile Include="Interpreter.fs" /> -->
-    <!-- <Compile Include="SDF.fs" /> -->
-    <!-- <Compile Include="Compiler.fs" /> -->
     <Compile Include="Colors.fs" />
     <Compile Include="HLSL.fs" />
-    <Compile Include="Interpreter2.fs" />
+    <Compile Include="Interpreter3.fs" />
     <Compile Include="PNG.fs" />
     <Compile Include="ConsoleRenderer.fs" />
     <!-- <Compile Include="WebGLRenderer.fs" /> -->

@@ -46,7 +46,9 @@ and Op =
     | Bool of System.Boolean
     | Int of System.Int32
     | Float of System.Double
-    | Vector of Expr[]
+    | Vector2 of (Expr*Expr)
+    | Vector3 of (Expr*Expr*Expr)
+    | Vector4 of (Expr*Expr*Expr*Expr)
     | Length of Expr
     | Unary of UnaryFn * Expr
     | Binary of BinaryFn * Expr * Expr
@@ -95,8 +97,8 @@ and [<Sealed>] vector2<'T when 'T:>IWrappable<'T> and 'T:>Expr > =
         static member Wrap(op:Op) = vector2(op)
     static member WrapBool(op:Op) = vector2<bool>(op)
 
-    new (v:'T) = { inherit Expr(Vector([|v;v|])) }
-    new (x:'T,y:'T) = { inherit Expr(Vector([|x;y|])) }
+    new (v:'T) = { inherit Expr(Vector2(v,v)) }
+    new (x:'T,y:'T) = { inherit Expr(Vector2(x,y)) }
     internal new (op:Op) = { inherit Expr(op) }
 
     member this.x = 'T.Wrap(this.Dot())
@@ -109,8 +111,8 @@ and [<Sealed>] vector3<'T when 'T:>IWrappable<'T> and 'T:>Expr> =
         static member Wrap(op:Op) = vector3(op)
     static member WrapBool(op:Op) = vector3<bool>(op)
 
-    new (v:'T) = { inherit Expr(Vector([|v;v;v|])) }
-    new (x:'T,y:'T,z:'T) = { inherit Expr(Vector([|x;y;z|])) }
+    new (v:'T) = { inherit Expr(Vector3(v,v,v)) }
+    new (x:'T,y:'T,z:'T) = { inherit Expr(Vector3(x,y,z)) }
     internal new (op:Op) = { inherit Expr(op) }
 
     member this.x = 'T.Wrap(this.Dot())
@@ -124,9 +126,9 @@ and vector4<'T when 'T:>IWrappable<'T> and 'T:>Expr> =
         static member Wrap(op:Op) = vector4(op)
     static member WrapBool(op:Op) = vector4<bool>(op)
 
-    new (v:'T) = { inherit Expr(Vector([|v;v;v;v|])) }
-    new (v:vector3<'T>,w:'T) = { inherit Expr(Vector([|v.x;v.y;v.z;w|])) }
-    new (x:'T,y:'T,z:'T,w:'T) = { inherit Expr(Vector([|x;y;z;w|])) }
+    new (v:'T) = { inherit Expr(Vector4(v,v,v,v)) }
+    new (v:vector3<'T>,w:'T) = { inherit Expr(Vector4(v.x,v.y,v.z,w)) }
+    new (x:'T,y:'T,z:'T,w:'T) = { inherit Expr(Vector4(x,y,z,w)) }
     internal new (op:Op) = { inherit Expr(op) }
 
     member this.x = 'T.Wrap(this.Dot())

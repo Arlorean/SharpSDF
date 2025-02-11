@@ -1,6 +1,7 @@
 module SharpSDF.TestShader
 
-open Ast2
+//open Ast2
+open Wrappers
 open AstShapes2
 
 open Shaders
@@ -26,16 +27,18 @@ let snowScene : ShapeFn =
     |> List.fold (fun shape i ->
         shape <+>
         (smallerSnowman 
-            |> scale (1.0/ i)
+            |> scale (1.0 / i)
             |> translate (i * -58.0) 0
         )
     ) empty
     |> translate 160 0
 
 let private shape :ShapeFn = snowScene
-//let shape :ShapeFn = circle 40
 
 let background = transparent
 
 let shader position =
     position |> shape |> sdfShader background
+
+let shader2 position =
+    position |> circle 40 |> sdfShader background

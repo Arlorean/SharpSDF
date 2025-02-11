@@ -1,6 +1,6 @@
 module SharpSDF.AstShapes2
 
-open Ast2
+open Wrappers
 
 type ShapeFn = float2 -> float
 
@@ -41,7 +41,7 @@ let circle (r:float) :ShapeFn=fun(p)->
     length(p) - r
 
 // Corner Radius (r:float4) = float4(tr,br,tl,bl)
-let roundedBox (hs:float2) (r:float4) :ShapeFn=fun(p)->
+let roundedBox (hs:float2) (r:float4) :ShapeFn = fun(p)->
     let r = If (p.x>0.0) (r.xy,r.zw)
     let r = If (p.y>0.0) (r.x, r.y)
     let q = abs(p) - hs + float2(r)

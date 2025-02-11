@@ -251,7 +251,9 @@ let rec Eval(expr:Ast2.Expr):Value =
     | Ast2.Bool (v) -> Value.Bool v
     | Ast2.Int (v) -> Value.Int v
     | Ast2.Float (v) -> Value.Float v
-    | Ast2.Vector (v) -> Value.Vector (Array.map Eval v)
+    | Ast2.Vector2 (x,y) -> Value.Vector [| Eval(x); Eval(y) |]
+    | Ast2.Vector3 (x,y,z) -> Value.Vector [| Eval(x); Eval(y); Eval(z) |]
+    | Ast2.Vector4 (x,y,z,w) -> Value.Vector [| Eval(x); Eval(y); Eval(z); Eval(w) |]
     | Ast2.Length (v) -> Eval(v) |> Value.Length
     | Ast2.Unary (op, v) -> Eval(v) |> (Operator.Fn op)
     | Ast2.Binary (op, v1, v2) -> (Eval(v1), Eval(v2)) ||> (Operator.Fn op)

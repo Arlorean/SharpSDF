@@ -1,6 +1,5 @@
 module SharpSDF.Shaders
 
-//open Ast2
 open Wrappers
 
 type SignedDistance = float

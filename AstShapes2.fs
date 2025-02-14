@@ -35,7 +35,7 @@ let scale (s:float) (shape:ShapeFn) :ShapeFn=fun(p)->
 //
 
 let empty :ShapeFn=fun(_)->
-    System.Double.MaxValue
+    double System.Single.MaxValue
 
 let circle (r:float) :ShapeFn=fun(p)->
     length(p) - r

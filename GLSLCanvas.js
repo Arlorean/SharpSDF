@@ -1,25 +1,10 @@
-// const canvas = document.getElementById("glCanvas");
-// const gl = canvas.getContext("webgl");
-
-// if (!gl) {
-//     console.error("WebGL not supported!");
-// }
-
 // Vertex Shader Source
-const vertexShaderSource = `
-    attribute vec4 aPosition;
+const vertexShaderSource = `#version 300 es
+    in vec4 aPosition;
     void main() {
         gl_Position = aPosition;
     }
 `;
-
-// Fragment Shader Source
-// const fragmentShaderSource = `
-//     precision mediump float;
-//     void main() {
-//         gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color
-//     }
-// `;
 
 // Compile Shader
 function compileShader(gl, source, type) {
@@ -52,19 +37,8 @@ function createProgram(gl, vertexSource, fragmentSource) {
     return program;
 }
 
-
-function init() {
-    const canvas = document.getElementById("glCanvas");
-    const gl = canvas.getContext("webgl");
-    
-    if (!gl) {
-        console.error("WebGL not supported!");
-    }
-    
-}
-
 // CanvasRenderingContext3D, string
-export function renderShader( gl, fragmentShaderSource )
+export function renderShader( gl, fragmentShaderSource, width, height )
 {
     // Initialize Shaders
     const program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
@@ -86,6 +60,9 @@ export function renderShader( gl, fragmentShaderSource )
     const positionLocation = gl.getAttribLocation(program, "aPosition");
     gl.enableVertexAttribArray(positionLocation);
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    const iResolutionLocation = gl.getUniformLocation(program, "iResolution");
+    gl.uniform3f(iResolutionLocation, width, height, 1);
 
     // Draw
     function draw() {

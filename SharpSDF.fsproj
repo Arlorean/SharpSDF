@@ -12,15 +12,14 @@
     <Compile Include="Wrappers.fs" />
     <Compile Include="AstShapes2.fs" />
     <Compile Include="Colors.fs" />
-    <Compile Include="HLSL.fs" />
+    <Compile Include="Values.fs" />
     <Compile Include="Interpreter3.fs" />
+    <Compile Include="GLSL.fs" />
     <Compile Include="PNG.fs" />
     <Compile Include="ConsoleRenderer.fs" />
-    <!-- <Compile Include="WebGLRenderer.fs" /> -->
+    <Compile Include="WebGLRenderer.fs" />
     <Compile Include="ShapeShaders.fs" />
     <Compile Include="CanvasRenderer.fs" />
-    <!-- <Compile Include="ShaderGenerator.fs" /> -->
-    <!-- <Compile Include="AstShapes.fs" /> -->
     <Compile Include="TestShader.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -28,5 +27,6 @@
     <PackageReference Include="Fable.Browser.Dom" Version="2.18.0" />
     <PackageReference Include="Fable.Browser.WebGL" Version="1.3.0" />
     <PackageReference Include="Fable.Core" Version="4.3.0" />
+    <PackageReference Include="FSharp.SystemTextJson" Version="1.3.13" />
   </ItemGroup>
 </Project>

@@ -5,9 +5,9 @@ let shader = TestShader.shader
 let main() =
     let compiledShader = Interpreter3.compileToInterpreter shader
 #if FABLE_COMPILER
-    // let webGL = new WebGLRenderer.WebGLRenderer("#WebGLRenderer")
-    // let shaderSource = ShaderGenerator.makeShader TestShader.shader
-    // webGL.RenderSource( shaderSource )
+    let webGL = new WebGLRenderer.WebGLRenderer("#WebGLRenderer")
+    let shaderSource = GLSL.GenerateFragment shader
+    webGL.RenderSource( shaderSource )
 
     let canvas = new CanvasRenderer.CanvasRenderer("#CanvasRenderer")
     canvas.Render compiledShader

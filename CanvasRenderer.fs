@@ -14,7 +14,7 @@ type CanvasRenderer =
         let imageData = context.createImageData(int32 canvas.width,int32 canvas.height)
         { canvas=canvas; context=context; imageData=imageData }
 
-    member private this.SetPixel (imageData:ImageData) (p:HLSL.float2) (c:HLSL.float4) =
+    member private this.SetPixel (imageData:ImageData) (p:Values.float2) (c:Values.float4) =
         let index = int32 (p.y * imageData.width + p.x) * 4
         imageData.data.[index + 0] <- uint8 (c.r*255.0)
         imageData.data.[index + 1] <- uint8 (c.g*255.0)
@@ -22,15 +22,15 @@ type CanvasRenderer =
         imageData.data.[index + 3] <- uint8 (c.a*255.0)
         ()
 
-    member this.Render (shader : HLSL.float2 -> HLSL.float4) = 
+    member this.Render (shader : Values.float2 -> Values.float4) = 
         let width = int32 this.imageData.width
         let height = int32 this.imageData.height
-        let size = HLSL.float2(width,height)
+        let size = Values.float2(width,height)
         let halfSize = size * 0.5
         for y in 0 .. height - 1 do
         for x in 0 .. width - 1 do
-            let pixel = HLSL.float2(x, y)
-            let position = HLSL.float2(x, height-y) - halfSize
+            let pixel = Values.float2(x, y)
+            let position = Values.float2(x, height-y) - halfSize
             let color = shader position 
             this.SetPixel this.imageData pixel color
 

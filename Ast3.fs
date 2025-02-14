@@ -3,6 +3,7 @@ module SharpSDF.Ast3
 type Compare = | EQ | NE | LT | GT | LE | GE
 
 and [<RequireQualifiedAccess>] Bool =
+    | Varying of string
     | Literal of System.Boolean
     | IfThenElse of Bool * Bool * Bool
     | (!) of Bool
@@ -14,6 +15,7 @@ and [<RequireQualifiedAccess>] Bool =
     | CompareFloat of Compare * Float * Float
 
 and [<RequireQualifiedAccess>] Int =
+    | Varying of string
     | Literal of System.Int32
     | IfThenElse of Bool * Int * Int
     | (~-) of Int
@@ -29,6 +31,7 @@ and [<RequireQualifiedAccess>] Int =
     | Min of Int * Int
 
 and [<RequireQualifiedAccess>] Float =
+    | Varying of string
     | Literal of System.Double
     | Length2 of Float * Float
     | Length3 of Float * Float * Float

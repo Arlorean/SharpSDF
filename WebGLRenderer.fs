@@ -1,17 +1,12 @@
 module SharpSDF.WebGLRenderer
 
-open Browser.WebGL
 open Browser.Types
 open Browser
 
-open SharpSDF.HLSL
 open Fable.Core
 
-// CanvasRenderingContext3D, string
-//export function renderShader( gl, fragmentShaderSource )
-
 [<Import("renderShader", "./GLSLCanvas.js")>]
-let renderShader( gl : WebGLRenderingContext, source : string ) : unit  = jsNative
+let renderShader( gl:WebGLRenderingContext, source:string, width:float, height:float ) : unit  = jsNative
 
 type WebGLRenderer =
     val private canvas: HTMLCanvasElement
@@ -19,9 +14,9 @@ type WebGLRenderer =
 
     new (canvasId:string) = 
         let canvas = document.querySelector(canvasId) :?> HTMLCanvasElement
-        let context = canvas.getContext("webgl") :?> WebGLRenderingContext
+        let context = canvas.getContext("webgl2") :?> WebGLRenderingContext
         { canvas=canvas; context=context }
 
     member this.RenderSource (source : string) = 
-        renderShader( this.context, source )
+        renderShader( this.context, source, this.canvas.width, this.canvas.height )
 

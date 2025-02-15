@@ -5,7 +5,7 @@ open Browser
 
 open Fable.Core
 
-[<Import("renderShader", "./GLSLCanvas.js")>]
+[<Import("renderShader", "../GLSLCanvas.js")>]
 let renderShader( gl:WebGLRenderingContext, source:string, width:float, height:float ) : unit  = jsNative
 
 type WebGLRenderer =

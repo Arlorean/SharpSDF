@@ -3,6 +3,9 @@
 **/node_modules
 **/.vscode
 
+build
+scripts
+
 .fake
 **/.idea
 **/bin

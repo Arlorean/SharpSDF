@@ -14,7 +14,7 @@ let main() =
 #else
     let console = new ConsoleRenderer.ConsoleRenderer(300, 300)
     console.Render compiledShader
-    console.SavePNG "ConsoleRenderer.png"
+    console.SavePNG "docs/images/ConsoleRenderer.png"
 #endif
 
 main()

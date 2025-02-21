@@ -11,3 +11,4 @@ scripts
 **/bin
 **/obj
 .DS_Store
+TestShader.dot

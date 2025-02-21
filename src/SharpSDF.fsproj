@@ -15,6 +15,7 @@
     <Compile Include="Values.fs" />
     <Compile Include="Interpreter3.fs" />
     <Compile Include="GLSL.fs" />
+    <Compile Include="DOT.fs" />
     <Compile Include="PNG.fs" />
     <Compile Include="ConsoleRenderer.fs" />
     <Compile Include="WebGLRenderer.fs" />

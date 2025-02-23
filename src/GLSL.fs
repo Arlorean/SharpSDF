@@ -1,6 +1,6 @@
 module SharpSDF.GLSL
 
-open Ast3
+open SharpSDF.Ast
 
 let floatString (v:float) = 
     match string v with

@@ -1,8 +1,12 @@
 ﻿open SharpSDF
 
-let shader = TestShader.shader2
+let shader = TestShader.shader
 
 let main() =
+    // Run optimization passes
+    let shader = Optimizer.foldConstantExpressions shader
+    //let shader = Optimizer.subExpressionElimination shader
+
     let compiledShader = Interpreter3.compileToInterpreter shader
 #if FABLE_COMPILER
     let webGL = new WebGLRenderer.WebGLRenderer("#WebGLRenderer")

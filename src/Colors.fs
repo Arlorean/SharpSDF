@@ -1,6 +1,5 @@
 module SharpSDF.Colors
 
-//open Ast2
 open Wrappers
 
 let transparent    = float4(0,0,0,0) 

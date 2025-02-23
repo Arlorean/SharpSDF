@@ -1,4 +1,4 @@
-module SharpSDF.Values
+namespace SharpSDF.Values
 
 type bool = System.Boolean
 type int = System.Int32

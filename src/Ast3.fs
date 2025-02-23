@@ -1,4 +1,4 @@
-module SharpSDF.Ast3
+namespace SharpSDF.Ast
 
 type Compare = | EQ | NE | LT | GT | LE | GE
 

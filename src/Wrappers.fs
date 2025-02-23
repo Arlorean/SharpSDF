@@ -1,14 +1,6 @@
 module SharpSDF.Wrappers
 
-open Ast3
-
-// type [<AbstractClass>] Vector<'t,'T,'AST> =
-//     val expr: 'AST
-//     internal new(expr: 'AST) = { expr = expr }
-
-// and [<AbstractClass>] Scalar<'t,'AST> =
-//     inherit Vector<'t,'AST,'AST>
-//     internal new(expr: 'AST) = { inherit Vector<'t,'AST,'AST>(expr) }
+open SharpSDF.Ast
 
 type [<Sealed>] bool =
     val internal expr : Bool

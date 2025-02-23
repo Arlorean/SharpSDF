@@ -1,10 +1,10 @@
 ﻿open SharpSDF
 
-let shader = TestShader.shader
+let shader = TestShader.shader2
 
 let main() =
     // Run optimization passes
-    let shader = Optimizer.foldConstantExpressions shader
+    //let shader = Optimizer.foldConstantExpressions shader
     //let shader = Optimizer.subExpressionElimination shader
 
     let compiledShader = Interpreter3.compileToInterpreter shader

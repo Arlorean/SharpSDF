@@ -3,7 +3,22 @@ module SharpSDF.Optimizer
 open SharpSDF.Ast
 
 let rec EvalB(v:Bool) : Bool =
-    match v with
+    let Eval = EvalB
+
+    let u =
+        match v with       
+        | Bool.Varying _ -> v 
+        | Bool.Literal _ -> v 
+        | Bool.IfThenElse (cond,t,f) -> Bool.IfThenElse (Eval cond, Eval t, Eval f)
+        | Bool.(!) (v) -> Bool.(!) (Eval v)
+        | Bool.(&&) (v1, v2) -> Bool.(&&) (Eval v1, Eval v2)
+        | Bool.(||) (v1, v2) -> Bool.(||) (Eval v1, Eval v2)
+        | Bool.(==) (v1, v2) -> Bool.(==) (Eval v1, Eval v2)
+        | Bool.(!=) (v1, v2) -> Bool.(!=) (Eval v1, Eval v2)
+        | Bool.CompareInt (fn, v1, v2) -> Bool.CompareInt (fn, EvalI v1, EvalI v2)
+        | Bool.CompareFloat (fn, v1, v2) -> Bool.CompareFloat (fn, EvalF v1, EvalF v2)
+
+    match u with
     | Bool.IfThenElse (Bool.Literal cond,t,f) -> if cond then t else f
     | Bool.(!) (Bool.Literal v) -> Bool.Literal (not v)
     | Bool.(&&) (Bool.Literal v1, Bool.Literal v2) -> Bool.Literal (v1&&v2)
@@ -26,10 +41,29 @@ let rec EvalB(v:Bool) : Bool =
         | GT -> Bool.Literal (v1>v2)
         | LE -> Bool.Literal (v1<=v2)
         | GE -> Bool.Literal (v1>=v2)
-    | _ -> v
+    | v -> v
 
 and EvalI(v:Int) : Int =
-    match v with
+    let Eval = EvalI
+
+    let u =
+        match v with
+        | Int.Varying _ -> v 
+        | Int.Literal _ -> v         
+        | Int.IfThenElse (cond,t,f) -> Int.IfThenElse (EvalB cond, Eval t, Eval f) 
+        | Int.(~-) (v) -> Int.(~-) (Eval v)
+        | Int.(~+) (v) -> Int.(~+) (Eval v)
+        | Int.(+) (v1, v2) -> Int.(+) (Eval v1, Eval v2) 
+        | Int.(-) (v1, v2) -> Int.(-) (Eval v1, Eval v2) 
+        | Int.(*) (v1, v2) -> Int.(*) (Eval v1, Eval v2) 
+        | Int.(/) (v1, v2) -> Int.(/) (Eval v1, Eval v2) 
+        | Int.(%) (v1, v2) -> Int.(%) (Eval v1, Eval v2) 
+        | Int.Abs (v) -> Int.Abs (Eval v)
+        | Int.Clamp (v, min, max) -> Int.Clamp (Eval v, Eval min, Eval max)
+        | Int.Max (v1, v2) -> Int.Max (Eval v1, Eval v2)
+        | Int.Min (v1, v2) -> Int.Min (Eval v1, Eval v2)
+        
+    match u with
     | Int.IfThenElse (Bool.Literal cond,t,f) -> if cond then t else f
     | Int.(~-) (Int.Literal v) -> Int.Literal -v
     | Int.(~+) (Int.Literal v) -> Int.Literal +v
@@ -45,15 +79,45 @@ and EvalI(v:Int) : Int =
     | _ -> v
 
 and EvalF(v:Float) : Float =
-    match v with
+    let Eval = EvalF
+
+    let u =
+        match v with
+        | Float.Varying _ -> v
+        | Float.Literal _ -> v
+        | Float.Length2 (x,y) -> Float.Length2 (Eval x, Eval y)
+        | Float.Length3 (x,y,z) -> Float.Length3 (Eval x, Eval y, Eval z)
+        | Float.Length4 (x,y,z,w) -> Float.Length4 (Eval x, Eval y, Eval z, Eval w)
+        | Float.IfThenElse (cond,t,f) -> Float.IfThenElse (EvalB cond, Eval t, Eval f)
+        | Float.(~-) (v) -> Float.(~-) (Eval v)
+        | Float.(~+) (v) -> Float.(~+) (Eval v)
+        | Float.(+) (v1, v2) -> Float.(+)(Eval v1, Eval v2)
+        | Float.(-) (v1, v2) -> Float.(-)(Eval v1, Eval v2)
+        | Float.(*) (v1, v2) -> Float.(*)(Eval v1, Eval v2)
+        | Float.(/) (v1, v2) -> Float.(/)(Eval v1, Eval v2)
+        | Float.(%) (v1, v2) -> Float.(%)(Eval v1, Eval v2)
+        | Float.Abs (v) -> Float.Abs (Eval v)
+        | Float.Clamp (v, min, max) -> Float.Clamp(Eval v, Eval min, Eval max)
+        | Float.Exp (v) -> Float.Exp (Eval v)
+        | Float.Lerp (v1, v2, t) -> Float.Lerp (Eval v1, Eval v2, Eval t)
+        | Float.Max (v1, v2) -> Float.Max (Eval v1, Eval v2)
+        | Float.Min (v1, v2) -> Float.Min (Eval v1, Eval v2)
+        | Float.SmoothStep (min, max, v) -> Float.SmoothStep (Eval min, Eval max, Eval v)
+        | Float.Step (v1, v2) -> Float.Step (Eval v1, Eval v2)
+
+    match u with
     | Float.Length2 (Float.Literal x, Float.Literal y) -> Float.Literal (Intrinsics.length(x,y))
+    | Float.Length2 (x,y) -> Float.Length2 (Eval x, Eval y)
     | Float.Length3 (Float.Literal x, Float.Literal y, Float.Literal z) -> Float.Literal (Intrinsics.length(x,y,z))
+    | Float.Length3 (x,y,z) -> Float.Length3 (Eval x, Eval y, Eval z)
     | Float.Length4 (Float.Literal x, Float.Literal y, Float.Literal z, Float.Literal w) -> Float.Literal (Intrinsics.length(x,y,z,w))
-    | Float.IfThenElse (Bool.Literal cond,t,f) -> if cond then t else f
+    | Float.Length4 (x,y,z,w) -> Float.Length4 (Eval x, Eval y, Eval z, Eval w)
+    | Float.IfThenElse (Bool.Literal cond,t,f) -> (if cond then t else f)
     | Float.(~-) (Float.Literal v) -> Float.Literal -v
     | Float.(~+) (Float.Literal v) -> Float.Literal +v
     | Float.(+) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1+v2)
     | Float.(-) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1-v2)
+    | Float.(*) (v1, Float.Literal 0.0) -> Float.Literal 0.0
     | Float.(*) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1*v2)
     | Float.(/) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1/v2)
     | Float.(%) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1%v2)
@@ -65,7 +129,7 @@ and EvalF(v:Float) : Float =
     | Float.Min (Float.Literal v1, Float.Literal v2) -> Float.Literal (Intrinsics.min(v1,v2))
     | Float.SmoothStep (Float.Literal min, Float.Literal max, Float.Literal v) -> Float.Literal (Intrinsics.smoothstep(min,max,v))
     | Float.Step (Float.Literal v1, Float.Literal v2) -> Float.Literal (Intrinsics.min(v1,v2))
-    | _ -> v
+    | v -> v
 
 let foldConstantExpressions (shader : Wrappers.float2 -> Wrappers.float4) = 
     let p = Wrappers.float2(Wrappers.float(Float.Varying "p.x"), Wrappers.float(Float.Varying "p.y"))
@@ -74,5 +138,10 @@ let foldConstantExpressions (shader : Wrappers.float2 -> Wrappers.float4) =
     let g = EvalF color.g
     let b = EvalF color.z
     let a = EvalF color.w
-    // TODO: Create a function where p is changed back into a parameter
-    shader
+    let result = Wrappers.float4(
+        Wrappers.float r,
+        Wrappers.float g,
+        Wrappers.float b,
+        Wrappers.float a
+    )
+    fun (p : Wrappers.float2) -> result

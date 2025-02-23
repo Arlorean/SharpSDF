@@ -1,6 +1,5 @@
 module SharpSDF.TestShader
 
-//open Ast2
 open Wrappers
 open AstShapes2
 
@@ -42,3 +41,6 @@ let shader position =
 
 let shader2 position =
     position |> circle 40 |> sdfShader background
+
+let shader3 (position:Position) : Color =
+    blue

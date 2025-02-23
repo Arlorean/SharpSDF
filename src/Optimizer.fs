@@ -112,13 +112,21 @@ and EvalF(v:Float) : Float =
     | Float.Length3 (x,y,z) -> Float.Length3 (Eval x, Eval y, Eval z)
     | Float.Length4 (Float.Literal x, Float.Literal y, Float.Literal z, Float.Literal w) -> Float.Literal (Intrinsics.length(x,y,z,w))
     | Float.Length4 (x,y,z,w) -> Float.Length4 (Eval x, Eval y, Eval z, Eval w)
-    | Float.IfThenElse (Bool.Literal cond,t,f) -> (if cond then t else f)
-    | Float.(~-) (Float.Literal v) -> Float.Literal -v
-    | Float.(~+) (Float.Literal v) -> Float.Literal +v
+    | Float.IfThenElse (Bool.Literal cond,t,f) -> if cond then t else f
+    | Float.(~-) (Float.Literal v) -> Eval (Float.Literal -v)
+    | Float.(~+) (Float.Literal v) -> Eval (Float.Literal +v)
+    | Float.(+) (v1, Float.Literal 0.0) -> Eval v1
+    | Float.(+) (Float.Literal 0.0, v2) -> Eval v2
     | Float.(+) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1+v2)
+    | Float.(-) (v1, Float.Literal 0.0) -> Eval v1
+    | Float.(-) (Float.Literal 0.0, v2) -> Float.(~-) (Eval v2)
     | Float.(-) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1-v2)
-    | Float.(*) (v1, Float.Literal 0.0) -> Float.Literal 0.0
+    | Float.(*) (_, Float.Literal 0.0) -> Float.Literal 0.0
+    | Float.(*) (Float.Literal 0.0, _) -> Float.Literal 0.0
+    | Float.(*) (v1, Float.Literal 1.0) -> Eval v1
+    | Float.(*) (Float.Literal 1.0, v2) -> Eval v2
     | Float.(*) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1*v2)
+    | Float.(/) (v1, Float.Literal 1.0) -> Eval v1
     | Float.(/) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1/v2)
     | Float.(%) (Float.Literal v1, Float.Literal v2) -> Float.Literal (v1%v2)
     | Float.Abs (Float.Literal v) -> Float.Literal (Intrinsics.abs v)
@@ -131,17 +139,15 @@ and EvalF(v:Float) : Float =
     | Float.Step (Float.Literal v1, Float.Literal v2) -> Float.Literal (Intrinsics.min(v1,v2))
     | v -> v
 
-let foldConstantExpressions (shader : Wrappers.float2 -> Wrappers.float4) = 
-    let p = Wrappers.float2(Wrappers.float(Float.Varying "p.x"), Wrappers.float(Float.Varying "p.y"))
-    let color = p |> shader
+let foldConstantExpressions (shader : Wrappers.float4) = 
+    let color = shader
     let r = EvalF color.r
     let g = EvalF color.g
     let b = EvalF color.z
     let a = EvalF color.w
-    let result = Wrappers.float4(
+    Wrappers.float4(
         Wrappers.float r,
         Wrappers.float g,
         Wrappers.float b,
         Wrappers.float a
     )
-    fun (p : Wrappers.float2) -> result

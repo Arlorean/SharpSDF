@@ -34,13 +34,16 @@ let snowScene : ShapeFn =
 
 let private shape :ShapeFn = snowScene
 
+let private position = float2(float(Ast.Float.Varying "p.x"), float(Ast.Float.Varying "p.y"))
+
+
 let background = transparent
 
-let shader position =
+let shader =
     position |> shape |> sdfShader background
 
-let shader2 position =
+let shader2 =
     position |> circle 40 |> sdfShader background
 
-let shader3 (position:Position) : Color =
-    blue
+let shader3 =
+    red

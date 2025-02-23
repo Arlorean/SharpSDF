@@ -6,7 +6,7 @@ type SignedDistance = float
 type Color = float4
 type Position = float2
 
-type ShapeFn = Position -> SignedDistance   // Native shape function
+type ShapeFn = Position -> SignedDistance
 type ShaderFn = SignedDistance -> Color
 type Shader = Color -> SignedDistance -> Color
 

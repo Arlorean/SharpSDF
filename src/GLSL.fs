@@ -72,8 +72,8 @@ and EvalF(v:Float) : string =
     | Float.SmoothStep (min, max, v) -> $"smoothstep({Eval min}, {Eval max}, {Eval v})"
     | Float.Step (v1, v2) -> $"step({Eval v1}, {Eval v2})"
 
-let GenerateMainImage (shader : Wrappers.float2 -> Wrappers.float4) = 
-    let color = Wrappers.float2(Wrappers.float(Float.Varying "p.x"), Wrappers.float(Float.Varying "p.y")) |> shader
+let GenerateMainImage (shader : Wrappers.float4) = 
+    let color = shader
     $"""
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {{
     vec2 p = fragCoord - iResolution.xy*0.5;
@@ -86,7 +86,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {{
 }}
     """
 
-let GenerateFragment (shader : Wrappers.float2 -> Wrappers.float4) = 
+let GenerateFragment (shader : Wrappers.float4) = 
     $"""#version 300 es
 
 precision mediump float;

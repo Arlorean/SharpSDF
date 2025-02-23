@@ -232,8 +232,8 @@ let EdgeDeclaration (exprMap:Map<int,Expr>) (expr:Expr, id:NodeId) =
     | Leaf s -> ""
     | Node (op, args) -> $"_{id} -> {{ {args |> Array.mapi (NodeArgId exprMap id) |> concatWithSpace } }}  # {op}"
 
-let GenerateGraph (shader : Wrappers.float2 -> Wrappers.float4) = 
-    let color = Wrappers.float2(Wrappers.float(Float.Varying "p.x"), Wrappers.float(Float.Varying "p.y")) |> shader
+let GenerateGraph (shader : Wrappers.float4) = 
+    let color = shader
     let r,exprs = EvalF color.r.expr Map.empty
     let g,exprs = EvalF color.g.expr exprs
     let b,exprs = EvalF color.b.expr exprs

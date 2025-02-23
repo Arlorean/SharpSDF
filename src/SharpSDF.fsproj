@@ -8,11 +8,13 @@
     <!-- <DefineConstants>$(DefineConstants);FABLE_COMPILER;</DefineConstants> -->
   </PropertyGroup>
   <ItemGroup>
+    
     <Compile Include="Ast3.fs" />
     <Compile Include="Wrappers.fs" />
     <Compile Include="Values.fs" />
     <Compile Include="Intrinsics.fs" />
-    <Compile Include="Optimizer.fs" />    
+    
+    <Compile Include="Optimizer.fs" />
     <Compile Include="AstShapes2.fs" />
     <Compile Include="Colors.fs" />
     <Compile Include="Interpreter3.fs" />
